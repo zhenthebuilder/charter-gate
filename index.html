@@ -92,12 +92,16 @@ charter log                        <span class="c"># tamper-evident audit trail<
   <p>We A/B-tested the charter gate on all 164 problems of <strong>HumanEval</strong>
   (official OpenAI scoring harness, hidden tests never shown to the model): same model,
   same prompt — the only difference is a deliverable contract with a verify→repair
-  loop on the B arm. Full raw logs, scoring code, and a NeurIPS-style paper are in the
-  repo's <a href="https://github.com/zhenthebuilder/charter-gate">research companion</a>.</p>
+  loop on the B arm. The honest headline: at 97.6% baseline accuracy the gate changed
+  pass@1 insignificantly (98.2%, McNemar p=1.0) — but it caught 18/164 first-attempt
+  contract breaches, auto-repaired 17, surfaced 1 as an explicit failure instead of a
+  silent "done", and broke nothing, at 1.12× model calls. Full raw logs, scoring code,
+  and a NeurIPS-style paper are in the repo's
+  <a href="https://github.com/zhenthebuilder/charter-gate/tree/main/research">research companion</a>.</p>
   <div class="grid">
-    <div class="card"><div class="num">164</div><p>public benchmark tasks per arm, paired design, exact McNemar test</p></div>
-    <div class="card"><div class="num">1 file</div><p>stdlib-only CLI; <code>uvx</code> stranger-install measured in seconds</p></div>
-    <div class="card"><div class="num">0</div><p>hidden-test leakage: the gate only checks model-authored smoke tests derived from the spec</p></div>
+    <div class="card"><div class="num">18/164</div><p>first-attempt contract breaches caught by the gate; 17 auto-repaired, 1 surfaced as an explicit failure</p></div>
+    <div class="card"><div class="num">0</div><p>regressions: no task that passed the baseline failed under the gate</p></div>
+    <div class="card"><div class="num">1.12×</div><p>model-call overhead for the whole verify→repair loop</p></div>
   </div>
   <p class="small">Numbers in the paper are generated from committed raw run logs by
   <code>experiments/analyze.py</code> — nothing hand-typed.</p>
