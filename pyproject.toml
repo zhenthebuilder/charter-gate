@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "charter-gate"
+version = "0.1.0"
+description = "Deliverable contracts for AI agents: declare what done means, gate any agent through verify->repair, keep a tamper-evident audit log."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Zhen Li" }]
+keywords = ["agents", "llm", "governance", "contracts", "ci"]
+
+[project.scripts]
+charter = "charter:main"
+
+[tool.hatch.build.targets.wheel]
+include = ["charter.py"]
+
+[tool.hatch.build.targets.sdist]
+include = ["charter.py", "README.md"]
