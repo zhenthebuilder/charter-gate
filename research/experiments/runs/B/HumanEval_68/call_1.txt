@@ -1,0 +1,93 @@
+Looking at this problem, I need to:
+
+1. Filter the array for even values (keeping track of indices)
+2. Find the smallest even value
+3. If there are multiple instances of the smallest value, pick the one with the smallest index
+4. Return `[value, index]` or `[]` if no even values exist
+
+Let me trace through Example 4 to verify my logic:
+- Input: `[5, 0, 3, 0, 4, 2]`
+- Even values with indices: `(0, 1), (0, 3), (4, 4), (2, 5)`
+- Min by value then index: `(0, 1)` ✓
+
+The key insight is that Python's `min()` on tuples naturally compares element-by-element, so `min([(0, 1), (0, 3), ...])` picks `(0, 1)` because when values are equal, it uses the index as the tiebreaker.
+
+### solution.py
+```python
+def pluck(arr):
+    """
+    "Given an array representing a branch of a tree that has non-negative integer nodes
+    your task is to pluck one of the nodes and return it.
+    The plucked node should be the node with the smallest even value.
+    If multiple nodes with the same smallest even value are found return the node that has smallest index.
+
+    The plucked node should be returned in a list, [ smalest_value, its index ],
+    If there are no even values or the given array is empty, return [].
+
+    Example 1:
+        Input: [4,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index.
+
+    Example 2:
+        Input: [1,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index. 
+
+    Example 3:
+        Input: []
+        Output: []
+    
+    Example 4:
+        Input: [5, 0, 3, 0, 4, 2]
+        Output: [0, 1]
+        Explanation: 0 is the smallest value, but  there are two zeros,
+                     so we will choose the first zero, which has the smallest index.
+
+    Constraints:
+        * 1 <= nodes.length <= 10000
+        * 0 <= node.value
+    """
+    even_values = [(val, idx) for idx, val in enumerate(arr) if val % 2 == 0]
+    
+    if not even_values:
+        return []
+    
+    min_val, min_idx = min(even_values)
+    return [min_val, min_idx]
+```
+
+### smoke_test.py
+```python
+from solution import pluck
+
+# Example 1
+assert pluck([4, 2, 3]) == [2, 1]
+
+# Example 2
+assert pluck([1, 2, 3]) == [2, 1]
+
+# Example 3
+assert pluck([]) == []
+
+# Example 4
+assert pluck([5, 0, 3, 0, 4, 2]) == [0, 1]
+
+# No even values
+assert pluck([1, 3, 5, 7]) == []
+
+# Single even value
+assert pluck([1, 4, 3]) == [4, 1]
+
+# Multiple same even values
+assert pluck([2, 2, 2]) == [2, 0]
+
+# Zero at start
+assert pluck([0, 1, 2]) == [0, 0]
+
+# Single element (even)
+assert pluck([6]) == [6, 0]
+
+# Single element (odd)
+assert pluck([5]) == []
+```

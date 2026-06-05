@@ -1,0 +1,49 @@
+Looking at this task, I need to:
+1. If the string has no letters, reverse it
+2. Otherwise, swap the case of each letter while keeping non-letters unchanged
+
+Let me trace through the examples:
+- `"1234"` has no letters → reverse to `"4321"` ✓
+- `"ab"` has letters → swap case to `"AB"` ✓
+- `"#a@C"` has letters → `"#"` stays, `"a"` → `"A"`, `"@"` stays, `"C"` → `"c"` = `"#A@c"` ✓
+
+### solution.py
+```python
+def solve(s):
+    """You are given a string s.
+    if s[i] is a letter, reverse its case from lower to upper or vise versa, 
+    otherwise keep it as it is.
+    If the string contains no letters, reverse the string.
+    The function should return the resulted string.
+    Examples
+    solve("1234") = "4321"
+    solve("ab") = "AB"
+    solve("#a@C") = "#A@c"
+    """
+    has_letters = any(c.isalpha() for c in s)
+    
+    if not has_letters:
+        return s[::-1]
+    
+    return ''.join(c.swapcase() if c.isalpha() else c for c in s)
+```
+
+### smoke_test.py
+```python
+from solution import solve
+
+# Test cases from the docstring
+assert solve("1234") == "4321"
+assert solve("ab") == "AB"
+assert solve("#a@C") == "#A@c"
+
+# Additional test cases
+assert solve("") == ""
+assert solve("A") == "a"
+assert solve("a") == "A"
+assert solve("ABC") == "abc"
+assert solve("123!@#") == "#@!321"
+assert solve("aB1Cd") == "Ab1cD"
+assert solve("!@#") == "#@!"
+assert solve("Hello World!") == "hELLO wORLD!"
+```

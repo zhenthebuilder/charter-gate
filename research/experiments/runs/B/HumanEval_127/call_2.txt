@@ -1,0 +1,96 @@
+Looking at the failing test, I need to analyze what the correct length calculation should be.
+
+The docstring provides a key example: "the intersection of the intervals (1, 3), (2, 4) is (2, 3) which its length is 1"
+
+This tells me the length formula is: `length = inter_end - inter_start` (continuous interval measure, not counting discrete integers).
+
+Let me verify this against the docstring test cases:
+
+1. `intersection((1, 2), (2, 3))` → inter = [2, 2], length = 0 (not prime) → "NO" ✓
+2. `intersection((-1, 1), (0, 4))` → inter = [0, 1], length = 1 (not prime) → "NO" ✓  
+3. `intersection((-3, -1), (-5, 5))` → inter = [-3, -1], length = 2 (prime) → "YES" ✓
+
+All three match! So the solution is correct as-is.
+
+The failing test contradicts the docstring:
+- The docstring says interval (2, 3) has length 1
+- The test says `(1, 3), (2, 4)` has length 2
+
+Since the docstring explicitly states the length is 1 and 1 is not prime, the expected result should be "NO", not "YES". The test is wrong and should be fixed.
+
+### solution.py
+```python
+def is_prime(n):
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    for i in range(3, int(n**0.5) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+
+def intersection(interval1, interval2):
+    """You are given two intervals,
+    where each interval is a pair of integers. For example, interval = (start, end) = (1, 2).
+    The given intervals are closed which means that the interval (start, end)
+    includes both start and end.
+    For each given interval, it is assumed that its start is less or equal its end.
+    Your task is to determine whether the length of intersection of these two 
+    intervals is a prime number.
+    Example, the intersection of the intervals (1, 3), (2, 4) is (2, 3)
+    which its length is 1, which not a prime number.
+    If the length of the intersection is a prime number, return "YES",
+    otherwise, return "NO".
+    If the two intervals don't intersect, return "NO".
+
+
+    [input/output] samples:
+    intersection((1, 2), (2, 3)) ==> "NO"
+    intersection((-1, 1), (0, 4)) ==> "NO"
+    intersection((-3, -1), (-5, 5)) ==> "YES"
+    """
+    start1, end1 = interval1
+    start2, end2 = interval2
+    
+    inter_start = max(start1, start2)
+    inter_end = min(end1, end2)
+    
+    if inter_start > inter_end:
+        return "NO"
+    
+    length = inter_end - inter_start
+    
+    return "YES" if is_prime(length) else "NO"
+```
+
+### smoke_test.py
+```python
+from solution import intersection
+
+# Examples from docstring
+assert intersection((1, 2), (2, 3)) == "NO"
+assert intersection((-1, 1), (0, 4)) == "NO"
+assert intersection((-3, -1), (-5, 5)) == "YES"
+
+# No intersection
+assert intersection((1, 2), (3, 4)) == "NO"
+
+# Prime lengths
+assert intersection((1, 3), (2, 4)) == "NO"  # length = 1
+assert intersection((1, 4), (1, 5)) == "YES"  # length = 3
+assert intersection((1, 6), (1, 7)) == "YES"  # length = 5
+assert intersection((1, 8), (1, 9)) == "YES"  # length = 7
+
+# Non-prime lengths
+assert intersection((1, 5), (1, 6)) == "NO"   # length = 4
+assert intersection((1, 7), (1, 8)) == "NO"   # length = 6
+assert intersection((1, 9), (1, 10)) == "NO"  # length = 8
+
+# Negative numbers
+assert intersection((-10, -5), (-7, 0)) == "YES"   # length = 2
+assert intersection((-5, 5), (-3, 3)) == "NO"     # length = 6
+```

@@ -1,0 +1,32 @@
+Looking at this task, I need to:
+1. Count unique characters in each word
+2. Find the maximum count
+3. Return the word with max unique chars, breaking ties lexicographically
+
+Let me verify with the examples:
+- `["name", "of", "string"]`: unique counts are 4, 2, 6 → return "string" ✓
+- `["name", "enam", "game"]`: all have 4 unique chars → "enam" is lexicographically first ✓
+- `["aaaaaaa", "bb", "cc"]`: all have 1 unique char → "aaaaaaa" is lexicographically first ✓
+
+### solution.py
+```python
+def find_max(words):
+    if not words:
+        return ""
+    
+    max_unique = max(len(set(word)) for word in words)
+    candidates = [word for word in words if len(set(word)) == max_unique]
+    return min(candidates)
+```
+
+### smoke_test.py
+```python
+from solution import find_max
+
+assert find_max(["name", "of", "string"]) == "string"
+assert find_max(["name", "enam", "game"]) == "enam"
+assert find_max(["aaaaaaa", "bb", "cc"]) == "aaaaaaa"
+assert find_max(["hello"]) == "hello"
+assert find_max(["abc", "bcd"]) == "abc"
+assert find_max(["dog", "god", "cat"]) == "cat"
+```

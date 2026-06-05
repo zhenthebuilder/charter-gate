@@ -1,0 +1,36 @@
+def minPath(grid, k):
+    n = len(grid)
+    
+    # Find the position of value 1
+    start_pos = None
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 1:
+                start_pos = (i, j)
+                break
+    
+    # DFS with memoization
+    memo = {}
+    
+    def dfs(row, col, remaining):
+        if remaining == 1:
+            return [grid[row][col]]
+        
+        if (row, col, remaining) in memo:
+            return memo[(row, col, remaining)]
+        
+        # Try all 4 directions and collect all possible paths
+        candidates = []
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            new_row, new_col = row + dr, col + dc
+            if 0 <= new_row < n and 0 <= new_col < n:
+                rest = dfs(new_row, new_col, remaining - 1)
+                candidates.append([grid[row][col]] + rest)
+        
+        # Sort candidates lexicographically and pick the smallest
+        candidates.sort()
+        result = candidates[0]
+        memo[(row, col, remaining)] = result
+        return result
+    
+    return dfs(start_pos[0], start_pos[1], k)

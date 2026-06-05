@@ -1,0 +1,65 @@
+Looking at the task, I need to understand what "not part of a word" means:
+
+- `"apple pie"` → False: 'e' is part of the word "pie"
+- `"apple pi e"` → True: 'e' is a standalone single character (not part of a multi-character word)
+- `"apple pi e "` → False: Last character is a space, not a letter
+
+So the function should return True if:
+1. The last character is a letter, AND
+2. It's a single-letter "word" (not preceded by another letter)
+
+This means the last character must be a letter AND either be at position 0 OR be preceded by a space.
+
+### solution.py
+```python
+def check_if_last_char_is_a_letter(txt):
+    '''
+    Create a function that returns True if the last character
+    of a given string is an alphabetical character and is not
+    a part of a word, and False otherwise.
+    Note: "word" is a group of characters separated by space.
+
+    Examples:
+    check_if_last_char_is_a_letter("apple pie") ➞ False
+    check_if_last_char_is_a_letter("apple pi e") ➞ True
+    check_if_last_char_is_a_letter("apple pi e ") ➞ False
+    check_if_last_char_is_a_letter("") ➞ False 
+    '''
+    if not txt:
+        return False
+    
+    last_char = txt[-1]
+    
+    if not last_char.isalpha():
+        return False
+    
+    # Single letter is not part of a word
+    if len(txt) == 1:
+        return True
+    
+    # Letter is not part of a word if preceded by a space
+    return txt[-2] == ' '
+```
+
+### smoke_test.py
+```python
+from solution import check_if_last_char_is_a_letter
+
+# Test cases from docstring
+assert check_if_last_char_is_a_letter("apple pie") == False
+assert check_if_last_char_is_a_letter("apple pi e") == True
+assert check_if_last_char_is_a_letter("apple pi e ") == False
+assert check_if_last_char_is_a_letter("") == False
+
+# Additional test cases
+assert check_if_last_char_is_a_letter("a") == True
+assert check_if_last_char_is_a_letter(" a") == True
+assert check_if_last_char_is_a_letter("a ") == False
+assert check_if_last_char_is_a_letter("ab") == False
+assert check_if_last_char_is_a_letter("a b") == True
+assert check_if_last_char_is_a_letter(" ") == False
+assert check_if_last_char_is_a_letter("hello world") == False
+assert check_if_last_char_is_a_letter("hello w") == True
+assert check_if_last_char_is_a_letter("123 a") == True
+assert check_if_last_char_is_a_letter("test 1") == False
+```

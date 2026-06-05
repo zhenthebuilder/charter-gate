@@ -1,0 +1,53 @@
+Looking at this problem, I need to:
+1. Understand circular right shift: move the rightmost digits to the front
+2. Handle the special case where shift > number of digits (reverse instead)
+3. Use modulo to handle shifts larger than the number of digits (in the normal case)
+
+Let me trace through the examples:
+- `circular_shift(12, 1)`: "12" shifted right by 1 → "21" (last digit moves to front)
+- `circular_shift(12, 2)`: "12" shifted right by 2 → "12" (full rotation, back to start)
+
+For a circular right shift by `n`, I take the last `n` characters and move them to the front: `digits[-n:] + digits[:-n]`
+
+### solution.py
+```python
+def circular_shift(x, shift):
+    """Circular shift the digits of the integer x, shift the digits right by shift
+    and return the result as a string.
+    If shift > number of digits, return digits reversed.
+    >>> circular_shift(12, 1)
+    "21"
+    >>> circular_shift(12, 2)
+    "12"
+    """
+    digits = str(x)
+    n = len(digits)
+    
+    if shift > n:
+        return digits[::-1]
+    
+    shift = shift % n
+    if shift == 0:
+        return digits
+    return digits[-shift:] + digits[:-shift]
+```
+
+### smoke_test.py
+```python
+from solution import circular_shift
+
+# Examples from docstring
+assert circular_shift(12, 1) == "21"
+assert circular_shift(12, 2) == "12"
+
+# Additional test cases
+assert circular_shift(123, 1) == "312"
+assert circular_shift(123, 2) == "231"
+assert circular_shift(123, 3) == "123"
+assert circular_shift(123, 4) == "321"
+assert circular_shift(1234, 2) == "3412"
+assert circular_shift(12345, 2) == "45123"
+assert circular_shift(5, 1) == "5"
+assert circular_shift(5, 2) == "5"
+assert circular_shift(0, 1) == "0"
+```

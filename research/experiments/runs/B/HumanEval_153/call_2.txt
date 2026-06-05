@@ -1,0 +1,46 @@
+Looking at the failure, I need to analyze why the test is failing.
+
+Let me calculate the strength for each extension in the failing test case `['aaa', 'bb', 'c']`:
+
+- `'aaa'`: CAP = 0, SM = 3, strength = 0 - 3 = **-3**
+- `'bb'`: CAP = 0, SM = 2, strength = 0 - 2 = **-2**  
+- `'c'`: CAP = 0, SM = 1, strength = 0 - 1 = **-1**
+
+The strongest extension is `'c'` with strength -1 (since -1 > -2 > -3), not `'bb'`.
+
+The solution code is correct — the `max()` function properly finds the extension with the highest strength value. The **test case is wrong**. I need to fix the assertion to expect `'Negative.c'` instead of `'Negative.bb'`.
+
+### solution.py
+```python
+def Strongest_Extension(class_name, extensions):
+    def calculate_strength(ext):
+        uppercase = sum(1 for c in ext if c.isupper())
+        lowercase = sum(1 for c in ext if c.islower())
+        return uppercase - lowercase
+    
+    strongest = max(extensions, key=calculate_strength)
+    return f"{class_name}.{strongest}"
+```
+
+### smoke_test.py
+```python
+from solution import Strongest_Extension
+
+# Docstring example 1
+assert Strongest_Extension('Slices', ['SErviNGSliCes', 'Cheese', 'StuFfed']) == 'Slices.SErviNGSliCes'
+
+# Docstring example 2
+assert Strongest_Extension('my_class', ['AA', 'Be', 'CC']) == 'my_class.AA'
+
+# Tie-breaking: same strength, pick first
+assert Strongest_Extension('Test', ['AAA', 'BBB']) == 'Test.AAA'
+
+# Single extension
+assert Strongest_Extension('Single', ['MyExt']) == 'Single.MyExt'
+
+# Negative strengths
+assert Strongest_Extension('Negative', ['aaa', 'bb', 'c']) == 'Negative.c'
+
+# All lowercase
+assert Strongest_Extension('AllLower', ['abc', 'def']) == 'AllLower.abc'
+```

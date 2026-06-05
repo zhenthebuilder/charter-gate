@@ -1,0 +1,61 @@
+Looking at the task, I need to:
+
+1. Calculate the sum of absolute values (magnitudes)
+2. Calculate the product of signs (1 for positive, -1 for negative, 0 if any zero exists)
+3. Multiply them together
+
+Let me verify my understanding with the examples:
+- `[1, 2, 2, -4]`: magnitudes sum = 9, signs product = 1×1×1×(-1) = -1, result = 9×(-1) = -9 ✓
+- `[0, 1]`: magnitudes sum = 1, signs product = 0 (because of zero), result = 1×0 = 0 ✓
+- `[]`: return None ✓
+
+### solution.py
+```python
+def prod_signs(arr):
+    """
+    You are given an array arr of integers and you need to return
+    sum of magnitudes of integers multiplied by product of all signs
+    of each number in the array, represented by 1, -1 or 0.
+    Note: return None for empty arr.
+
+    Example:
+    >>> prod_signs([1, 2, 2, -4]) == -9
+    >>> prod_signs([0, 1]) == 0
+    >>> prod_signs([]) == None
+    """
+    if not arr:
+        return None
+    
+    # Sum of magnitudes
+    magnitude_sum = sum(abs(x) for x in arr)
+    
+    # Product of signs: check for zero, count negatives
+    if any(x == 0 for x in arr):
+        sign_product = 0
+    else:
+        negative_count = sum(1 for x in arr if x < 0)
+        sign_product = 1 if negative_count % 2 == 0 else -1
+    
+    return magnitude_sum * sign_product
+```
+
+### smoke_test.py
+```python
+from solution import prod_signs
+
+# From docstring examples
+assert prod_signs([1, 2, 2, -4]) == -9
+assert prod_signs([0, 1]) == 0
+assert prod_signs([]) is None
+
+# Additional cases from specification
+assert prod_signs([1, 2, 3]) == 6
+assert prod_signs([-1, -2, -3, -4]) == 10  # even negatives, sign product = 1
+assert prod_signs([-1, -2, -3]) == -6  # odd negatives, sign product = -1
+assert prod_signs([5]) == 5
+assert prod_signs([-5]) == -5
+assert prod_signs([0]) == 0
+assert prod_signs([1, 2, 0, 3]) == 0  # zero makes product 0
+assert prod_signs([0, 0, 0]) == 0
+assert prod_signs([-1, -1, 2, 3]) == 7  # even negatives (2), sum = 7, product = 1
+```

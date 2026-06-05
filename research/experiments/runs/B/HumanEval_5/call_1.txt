@@ -1,0 +1,49 @@
+### solution.py
+```python
+from typing import List
+
+
+def intersperse(numbers: List[int], delimeter: int) -> List[int]:
+    """ Insert a number 'delimeter' between every two consecutive elements of input list `numbers'
+    >>> intersperse([], 4)
+    []
+    >>> intersperse([1, 2, 3], 4)
+    [1, 4, 2, 4, 3]
+    """
+    if not numbers:
+        return []
+    result = [numbers[0]]
+    for num in numbers[1:]:
+        result.append(delimeter)
+        result.append(num)
+    return result
+```
+
+### smoke_test.py
+```python
+from solution import intersperse
+
+
+def test_intersperse():
+    # Test empty list
+    assert intersperse([], 4) == []
+    
+    # Test single element
+    assert intersperse([1], 4) == [1]
+    
+    # Test docstring example
+    assert intersperse([1, 2, 3], 4) == [1, 4, 2, 4, 3]
+    
+    # Test with two elements
+    assert intersperse([1, 2], 4) == [1, 4, 2]
+    
+    # Test with delimiter 0
+    assert intersperse([1, 2, 3], 0) == [1, 0, 2, 0, 3]
+    
+    # Test with negative numbers
+    assert intersperse([-1, -2, -3], 0) == [-1, 0, -2, 0, -3]
+
+
+if __name__ == "__main__":
+    test_intersperse()
+```

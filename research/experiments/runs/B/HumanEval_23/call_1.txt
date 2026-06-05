@@ -1,0 +1,22 @@
+### solution.py
+```python
+def strlen(string: str) -> int:
+    """ Return length of given string
+    >>> strlen('')
+    0
+    >>> strlen('abc')
+    3
+    """
+    return len(string)
+```
+
+### smoke_test.py
+```python
+from solution import strlen
+
+assert strlen('') == 0
+assert strlen('abc') == 3
+assert strlen('a') == 1
+assert strlen('hello world') == 11
+assert strlen('12345') == 5
+```

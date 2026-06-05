@@ -1,0 +1,58 @@
+### solution.py
+```python
+def reverse_delete(s, c):
+    """Task
+    We are given two strings s and c, you have to deleted all the characters in s that are equal to any character in c
+    then check if the result string is palindrome.
+    A string is called palindrome if it reads the same backward as forward.
+    You should return a tuple containing the result string and True/False for the check.
+    Example
+    For s = "abcde", c = "ae", the result should be ('bcd',False)
+    For s = "abcdef", c = "b"  the result should be ('acdef',False)
+    For s = "abcdedcba", c = "ab", the result should be ('cdedc',True)
+    """
+    chars_to_delete = set(c)
+    result = ''.join(char for char in s if char not in chars_to_delete)
+    is_palindrome = result == result[::-1]
+    return (result, is_palindrome)
+```
+
+### smoke_test.py
+```python
+from solution import reverse_delete
+
+# Example 1
+result, is_palindrome = reverse_delete("abcde", "ae")
+assert result == "bcd"
+assert is_palindrome == False
+
+# Example 2
+result, is_palindrome = reverse_delete("abcdef", "b")
+assert result == "acdef"
+assert is_palindrome == False
+
+# Example 3
+result, is_palindrome = reverse_delete("abcdedcba", "ab")
+assert result == "cdedc"
+assert is_palindrome == True
+
+# Edge case: all characters deleted
+result, is_palindrome = reverse_delete("aaa", "a")
+assert result == ""
+assert is_palindrome == True
+
+# Edge case: single character remains
+result, is_palindrome = reverse_delete("abc", "bc")
+assert result == "a"
+assert is_palindrome == True
+
+# Edge case: nothing deleted, result is palindrome
+result, is_palindrome = reverse_delete("racecar", "xyz")
+assert result == "racecar"
+assert is_palindrome == True
+
+# Edge case: nothing deleted, result is not palindrome
+result, is_palindrome = reverse_delete("abc", "xyz")
+assert result == "abc"
+assert is_palindrome == False
+```

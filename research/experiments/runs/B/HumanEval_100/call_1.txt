@@ -1,0 +1,41 @@
+### solution.py
+```python
+def make_a_pile(n):
+    """
+    Given a positive integer n, you have to make a pile of n levels of stones.
+    The first level has n stones.
+    The number of stones in the next level is:
+        - the next odd number if n is odd.
+        - the next even number if n is even.
+    Return the number of stones in each level in a list, where element at index
+    i represents the number of stones in the level (i+1).
+
+    Examples:
+    >>> make_a_pile(3)
+    [3, 5, 7]
+    """
+    return [n + 2 * i for i in range(n)]
+```
+
+### smoke_test.py
+```python
+from solution import make_a_pile
+
+# Test from docstring
+assert make_a_pile(3) == [3, 5, 7]
+
+# Test with n=1
+assert make_a_pile(1) == [1]
+
+# Test with n=2 (even starting number)
+assert make_a_pile(2) == [2, 4]
+
+# Test with n=4 (even, multiple levels)
+assert make_a_pile(4) == [4, 6, 8, 10]
+
+# Test with n=5 (odd, multiple levels)
+assert make_a_pile(5) == [5, 7, 9, 11, 13]
+
+# Test with n=6
+assert make_a_pile(6) == [6, 8, 10, 12, 14, 16]
+```

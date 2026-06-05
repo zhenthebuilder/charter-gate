@@ -1,0 +1,42 @@
+Looking at the examples:
+- `multiply(148, 412)` → unit digits 8 and 2 → 8 × 2 = 16
+- `multiply(19, 28)` → unit digits 9 and 8 → 9 × 8 = 72
+- `multiply(2020, 1851)` → unit digits 0 and 1 → 0 × 1 = 0
+- `multiply(14, -15)` → unit digits 4 and 5 (of absolute value) → 4 × 5 = 20
+
+The function extracts unit digits (last digit) using modulo, taking absolute values for negative numbers.
+
+### solution.py
+```python
+def multiply(a, b):
+    """Complete the function that takes two integers and returns 
+    the product of their unit digits.
+    Assume the input is always valid.
+    Examples:
+    multiply(148, 412) should return 16.
+    multiply(19, 28) should return 72.
+    multiply(2020, 1851) should return 0.
+    multiply(14,-15) should return 20.
+    """
+    return (abs(a) % 10) * (abs(b) % 10)
+```
+
+### smoke_test.py
+```python
+from solution import multiply
+
+# Docstring examples
+assert multiply(148, 412) == 16
+assert multiply(19, 28) == 72
+assert multiply(2020, 1851) == 0
+assert multiply(14, -15) == 20
+
+# Additional cases
+assert multiply(1, 1) == 1
+assert multiply(10, 10) == 0
+assert multiply(5, 7) == 35
+assert multiply(-5, -7) == 35
+assert multiply(0, 100) == 0
+assert multiply(999, 999) == 81
+assert multiply(123, 456) == 18
+```

@@ -1,0 +1,49 @@
+### solution.py
+```python
+import math
+
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+    # Check if valid triangle
+    if a + b > c and a + c > b and b + c > a:
+        # Calculate area using Heron's formula
+        s = (a + b + c) / 2
+        area = math.sqrt(s * (s - a) * (s - b) * (s - c))
+        return round(area, 2)
+    else:
+        return -1
+```
+
+### smoke_test.py
+```python
+from solution import triangle_area
+import math
+
+# Test examples from docstring
+assert triangle_area(3, 4, 5) == 6.00
+assert triangle_area(1, 2, 10) == -1
+
+# Test equilateral triangle with side 2
+assert triangle_area(2, 2, 2) == round(math.sqrt(3), 2)
+
+# Test isosceles triangle
+assert triangle_area(5, 5, 6) == 12.0
+
+# Test boundary case: sum of two sides equals third (invalid)
+assert triangle_area(1, 2, 3) == -1
+
+# Test different orderings of valid triangle
+assert triangle_area(4, 3, 5) == 6.00
+
+# Test another invalid triangle
+assert triangle_area(1, 1, 5) == -1
+```

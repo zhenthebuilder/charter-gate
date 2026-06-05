@@ -1,0 +1,82 @@
+Looking at this task, I need to:
+
+1. Find all occurrences of integer `x` in a 2D jagged list
+2. Return coordinates as tuples (row, column)
+3. Sort by row ascending, then by column descending within each row
+
+Let me trace the main example to verify my understanding:
+- Looking for `1` in the 3×6 matrix
+- Row 0: `1` at column 0 → (0, 0)
+- Row 1: `1` at columns 0 and 4 → (1, 4) and (1, 0) (descending by column)
+- Row 2: `1` at columns 0 and 5 → (2, 5) and (2, 0) (descending by column)
+- Result: [(0, 0), (1, 4), (1, 0), (2, 5), (2, 0)] ✓
+
+### solution.py
+```python
+def get_row(lst, x):
+    """
+    You are given a 2 dimensional data, as a nested lists,
+    which is similar to matrix, however, unlike matrices,
+    each row may contain a different number of columns.
+    Given lst, and integer x, find integers x in the list,
+    and return list of tuples, [(x1, y1), (x2, y2) ...] such that
+    each tuple is a coordinate - (row, columns), starting with 0.
+    Sort coordinates initially by rows in ascending order.
+    Also, sort coordinates of the row by columns in descending order.
+    
+    Examples:
+    get_row([
+      [1,2,3,4,5,6],
+      [1,2,3,4,1,6],
+      [1,2,3,4,5,1]
+    ], 1) == [(0, 0), (1, 4), (1, 0), (2, 5), (2, 0)]
+    get_row([], 1) == []
+    get_row([[], [1], [1, 2, 3]], 3) == [(2, 2)]
+    """
+    result = []
+    for row_idx, row in enumerate(lst):
+        for col_idx, val in enumerate(row):
+            if val == x:
+                result.append((row_idx, col_idx))
+    
+    result.sort(key=lambda coord: (coord[0], -coord[1]))
+    
+    return result
+```
+
+### smoke_test.py
+```python
+from solution import get_row
+
+# Example 1
+result = get_row([
+    [1,2,3,4,5,6],
+    [1,2,3,4,1,6],
+    [1,2,3,4,5,1]
+], 1)
+assert result == [(0, 0), (1, 4), (1, 0), (2, 5), (2, 0)]
+
+# Example 2
+result = get_row([], 1)
+assert result == []
+
+# Example 3
+result = get_row([[], [1], [1, 2, 3]], 3)
+assert result == [(2, 2)]
+
+# Extra: single element
+result = get_row([[5]], 5)
+assert result == [(0, 0)]
+
+# Extra: element not found
+result = get_row([[1, 2, 3], [4, 5, 6]], 7)
+assert result == []
+
+# Extra: multiple in single row (descending)
+result = get_row([[1, 1, 1]], 1)
+assert result == [(0, 2), (0, 1), (0, 0)]
+
+# Extra: multiple rows with different lengths
+result = get_row([[2, 2], [2, 2, 2]], 2)
+assert result == [(0, 1), (0, 0), (1, 2), (1, 1), (1, 0)]
+```

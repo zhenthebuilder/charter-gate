@@ -1,0 +1,78 @@
+{
+ "n_tasks": 164,
+ "pass_at_1_A": 0.975609756097561,
+ "pass_at_1_B": 0.9817073170731707,
+ "passed_A": 160,
+ "passed_B": 161,
+ "wilson95_A": [
+  0.9389724491813946,
+  0.9904753158542104
+ ],
+ "wilson95_B": [
+  0.9476039961640231,
+  0.9937597658592178
+ ],
+ "delta_pp": 0.6097560975609762,
+ "discordant_B_fixed": 1,
+ "discordant_B_broke": 0,
+ "mcnemar_exact_p": 1.0,
+ "call_stats": {
+  "A": {
+   "n_tasks_with_meta": 164,
+   "mean_model_calls": 1.0,
+   "total_model_calls": 164,
+   "mean_model_seconds": 11.558353658536586
+  },
+  "B": {
+   "n_tasks_with_meta": 164,
+   "mean_model_calls": 1.1219512195121952,
+   "total_model_calls": 184,
+   "mean_model_seconds": 19.57207317073171
+  }
+ },
+ "charter_B": {
+  "first_attempt_ok": 146,
+  "repaired_to_ok": 17,
+  "unresolved_breach": 1,
+  "attempts_histogram": {
+   "1": 146,
+   "2": 16,
+   "3": 2
+  }
+ },
+ "fixed_tasks": [
+  "HumanEval/92"
+ ],
+ "broken_tasks": [],
+ "B0_first_attempt": {
+  "pass_at_1_B0": 0.9817073170731707,
+  "passed_B0": 161,
+  "repair_fixed_hidden": [],
+  "repair_broke_hidden": [],
+  "repaired_tasks": [
+   "HumanEval/121",
+   "HumanEval/125",
+   "HumanEval/127",
+   "HumanEval/131",
+   "HumanEval/137",
+   "HumanEval/143",
+   "HumanEval/145",
+   "HumanEval/153",
+   "HumanEval/16",
+   "HumanEval/160",
+   "HumanEval/162",
+   "HumanEval/46",
+   "HumanEval/47",
+   "HumanEval/50",
+   "HumanEval/64",
+   "HumanEval/80",
+   "HumanEval/98"
+  ],
+  "repaired_false_alarm": 15,
+  "repaired_true_bug": 2,
+  "unresolved_tasks": [
+   "HumanEval/132"
+  ],
+  "unresolved_hidden_pass": 1
+ }
+}

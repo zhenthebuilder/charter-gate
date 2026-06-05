@@ -1,0 +1,98 @@
+Looking at this task, I need to:
+1. Remove spaces from the input string
+2. Track parentheses balance (open +1, close -1)
+3. When balance reaches 0, a complete group is found
+4. Return all groups as a list
+
+Let me trace through the example:
+- Input: `'( ) (( )) (( )( ))'`
+- Remove spaces: `'()(())(()())'`
+- Group 1: `()` (balance: 1→0)
+- Group 2: `(())` (balance: 1→2→1→0)
+- Group 3: `(()())` (balance: 1→2→1→2→1→0)
+
+### solution.py
+```python
+from typing import List
+
+
+def separate_paren_groups(paren_string: str) -> List[str]:
+    """ Input to this function is a string containing multiple groups of nested parentheses. Your goal is to
+    separate those group into separate strings and return the list of those.
+    Separate groups are balanced (each open brace is properly closed) and not nested within each other
+    Ignore any spaces in the input string.
+    >>> separate_paren_groups('( ) (( )) (( )( ))')
+    ['()', '(())', '(()())']
+    """
+    paren_string = paren_string.replace(' ', '')
+    
+    result = []
+    current_group = ''
+    balance = 0
+    
+    for char in paren_string:
+        current_group += char
+        if char == '(':
+            balance += 1
+        elif char == ')':
+            balance -= 1
+        
+        if balance == 0:
+            result.append(current_group)
+            current_group = ''
+    
+    return result
+```
+
+### smoke_test.py
+```python
+from solution import separate_paren_groups
+
+
+def test_basic_example():
+    assert separate_paren_groups('( ) (( )) (( )( ))') == ['()', '(())', '(()())']
+
+
+def test_empty_string():
+    assert separate_paren_groups('') == []
+
+
+def test_single_group():
+    assert separate_paren_groups('()') == ['()']
+
+
+def test_multiple_simple_groups():
+    assert separate_paren_groups('()()') == ['()', '()']
+
+
+def test_nested_group():
+    assert separate_paren_groups('(())') == ['(())']
+
+
+def test_spaces_everywhere():
+    assert separate_paren_groups(' ( ( ) ) ') == ['(())']
+
+
+def test_multiple_groups_with_spaces():
+    assert separate_paren_groups('() ()') == ['()', '()']
+
+
+def test_deeply_nested():
+    assert separate_paren_groups('(((())))') == ['(((())))']
+
+
+def test_alternating_pattern():
+    assert separate_paren_groups('()()()') == ['()', '()', '()']
+
+
+if __name__ == '__main__':
+    test_basic_example()
+    test_empty_string()
+    test_single_group()
+    test_multiple_simple_groups()
+    test_nested_group()
+    test_spaces_everywhere()
+    test_multiple_groups_with_spaces()
+    test_deeply_nested()
+    test_alternating_pattern()
+```

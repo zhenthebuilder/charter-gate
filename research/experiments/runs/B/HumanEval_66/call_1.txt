@@ -1,0 +1,41 @@
+Looking at the task, I need to create a function that sums the ASCII codes of uppercase characters only.
+
+Let me trace through an example to confirm:
+- `digitSum("abAB")` => 'A' (65) + 'B' (66) = 131 ✓
+- `digitSum("abcCd")` => 'C' (67) = 67 ✓
+
+### solution.py
+```python
+def digitSum(s):
+    """Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("") => 0
+        digitSum("abAB") => 131
+        digitSum("abcCd") => 67
+        digitSum("helloE") => 69
+        digitSum("woArBld") => 131
+        digitSum("aAaaaXa") => 153
+    """
+    return sum(ord(char) for char in s if char.isupper())
+```
+
+### smoke_test.py
+```python
+from solution import digitSum
+
+# Examples from docstring
+assert digitSum("") == 0
+assert digitSum("abAB") == 131
+assert digitSum("abcCd") == 67
+assert digitSum("helloE") == 69
+assert digitSum("woArBld") == 131
+assert digitSum("aAaaaXa") == 153
+
+# Extra cases
+assert digitSum("A") == 65
+assert digitSum("ABC") == 65 + 66 + 67
+assert digitSum("aabbcc") == 0
+```

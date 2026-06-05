@@ -1,0 +1,71 @@
+Looking at this task, I need to implement a root-finding algorithm for polynomials. The key constraint is that the input guarantees an odd-degree polynomial (even number of coefficients) with a non-zero leading coefficient, which means a real zero always exists.
+
+I'll use Newton-Raphson method, which is efficient for polynomial root-finding since I can compute the exact derivative.
+
+For a polynomial f(x) = xs[0] + xs[1]·x + xs[2]·x² + ... + xs[n]·xⁿ:
+- The derivative is f'(x) = xs[1] + 2·xs[2]·x + 3·xs[3]·x² + ...
+
+Newton's method: x_{n+1} = x_n - f(x_n) / f'(x_n)
+
+Let me verify with the examples:
+- f(x) = 1 + 2x, starting x=0: x₁ = 0 - 1/2 = -0.5 ✓
+- f(x) = -6 + 11x - 6x² + x³ has roots at 1, 2, 3 ✓
+
+### solution.py
+```python
+import math
+
+def poly(xs: list, x: float):
+    """
+    Evaluates polynomial with coefficients xs at point x.
+    return xs[0] + xs[1] * x + xs[1] * x^2 + .... xs[n] * x^n
+    """
+    return sum([coeff * math.pow(x, i) for i, coeff in enumerate(xs)])
+
+def find_zero(xs: list):
+    """ xs are coefficients of a polynomial.
+    find_zero find x such that poly(x) = 0.
+    find_zero returns only only zero point, even if there are many.
+    Moreover, find_zero only takes list xs having even number of coefficients
+    and largest non zero coefficient as it guarantees
+    a solution.
+    >>> round(find_zero([1, 2]), 2) # f(x) = 1 + 2x
+    -0.5
+    >>> round(find_zero([-6, 11, -6, 1]), 2) # (x - 1) * (x - 2) * (x - 3) = -6 + 11x - 6x^2 + x^3
+    1.0
+    """
+    def f(x):
+        return poly(xs, x)
+    
+    def f_prime(x):
+        return sum([i * xs[i] * math.pow(x, i-1) for i in range(1, len(xs))])
+    
+    x = 0.0
+    for _ in range(100):
+        fx = f(x)
+        if abs(fx) < 1e-10:
+            return x
+        fpx = f_prime(x)
+        if abs(fpx) < 1e-15:
+            break
+        x = x - fx / fpx
+    
+    return x
+```
+
+### smoke_test.py
+```python
+from solution import find_zero, poly
+
+# Test example 1: f(x) = 1 + 2x, expect x = -0.5
+result1 = find_zero([1, 2])
+assert round(result1, 2) == -0.5
+
+# Test example 2: f(x) = -6 + 11x - 6x^2 + x^3, expect one of [1, 2, 3]
+result2 = find_zero([-6, 11, -6, 1])
+assert round(result2, 2) in [1.0, 2.0, 3.0]
+
+# Verify results are actual zeros
+assert abs(poly([1, 2], result1)) < 1e-6
+assert abs(poly([-6, 11, -6, 1], result2)) < 1e-6
+```

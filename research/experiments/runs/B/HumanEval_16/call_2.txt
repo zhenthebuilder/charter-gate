@@ -1,0 +1,42 @@
+Looking at the contract violation, the test assertion is incorrect. Let me trace through:
+
+- Input: `'a b c'`
+- Distinct characters (case-insensitive): `'a'`, `' '` (space), `'b'`, `'c'` = 4 characters
+- Test asserts 5, which is wrong
+
+The solution is correct—it properly counts all distinct characters. The test needs to be fixed.
+
+### solution.py
+```python
+def count_distinct_characters(string: str) -> int:
+    """ Given a string, find out how many distinct characters (regardless of case) does it consist of
+    >>> count_distinct_characters('xyzXYZ')
+    3
+    >>> count_distinct_characters('Jerry')
+    4
+    """
+    return len(set(string.lower()))
+```
+
+### smoke_test.py
+```python
+from solution import count_distinct_characters
+
+# Docstring examples
+assert count_distinct_characters('xyzXYZ') == 3
+assert count_distinct_characters('Jerry') == 4
+
+# Edge cases
+assert count_distinct_characters('') == 0
+assert count_distinct_characters('a') == 1
+assert count_distinct_characters('aaaa') == 1
+assert count_distinct_characters('AaBbCc') == 3
+
+# Case-insensitivity verification
+assert count_distinct_characters('AAaa') == 1
+assert count_distinct_characters('aAbBcC') == 3
+
+# Mixed with special characters
+assert count_distinct_characters('Hello123') == 7
+assert count_distinct_characters('a b c') == 4
+```

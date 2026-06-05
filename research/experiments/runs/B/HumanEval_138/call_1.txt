@@ -1,0 +1,43 @@
+Looking at this problem, I need to determine when a number can be expressed as the sum of exactly 4 positive even numbers.
+
+Let me analyze:
+- The minimum sum of 4 positive even numbers is 2+2+2+2 = 8
+- For any even number n ≥ 8, I can write: n = 2+2+2+(n-6), where (n-6) is positive and even
+- Therefore, the condition is: **n ≥ 8 AND n is even**
+
+Let me verify the examples:
+- is_equal_to_sum_even(4) = False (4 < 8) ✓
+- is_equal_to_sum_even(6) = False (6 < 8) ✓
+- is_equal_to_sum_even(8) = True (8 = 2+2+2+2) ✓
+
+### solution.py
+```python
+def is_equal_to_sum_even(n):
+    """Evaluate whether the given number n can be written as the sum of exactly 4 positive even numbers
+    Example
+    is_equal_to_sum_even(4) == False
+    is_equal_to_sum_even(6) == False
+    is_equal_to_sum_even(8) == True
+    """
+    return n >= 8 and n % 2 == 0
+```
+
+### smoke_test.py
+```python
+from solution import is_equal_to_sum_even
+
+# Test cases from docstring
+assert is_equal_to_sum_even(4) == False
+assert is_equal_to_sum_even(6) == False
+assert is_equal_to_sum_even(8) == True
+
+# Additional test cases
+assert is_equal_to_sum_even(10) == True  # 2 + 2 + 2 + 4
+assert is_equal_to_sum_even(12) == True  # 2 + 2 + 2 + 6
+assert is_equal_to_sum_even(14) == True  # 2 + 2 + 2 + 8
+assert is_equal_to_sum_even(1) == False  # Too small
+assert is_equal_to_sum_even(2) == False  # Too small
+assert is_equal_to_sum_even(7) == False  # Odd
+assert is_equal_to_sum_even(9) == False  # Odd
+assert is_equal_to_sum_even(100) == True  # 2 + 2 + 2 + 94
+```

@@ -1,0 +1,1 @@
+Vendored from https://github.com/openai/human-eval @ 6d43fb980f9fee3c892a914eda09951f772ad10d (MIT). Unmodified; the exec line in human_eval/execution.py ships enabled at this commit.

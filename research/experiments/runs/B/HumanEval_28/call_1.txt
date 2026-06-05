@@ -1,0 +1,40 @@
+### solution.py
+```python
+from typing import List
+
+
+def concatenate(strings: List[str]) -> str:
+    """ Concatenate list of strings into a single string
+    >>> concatenate([])
+    ''
+    >>> concatenate(['a', 'b', 'c'])
+    'abc'
+    """
+    return ''.join(strings)
+```
+
+### smoke_test.py
+```python
+from solution import concatenate
+
+
+def test_concatenate():
+    # Test empty list
+    assert concatenate([]) == ''
+    
+    # Test multiple strings
+    assert concatenate(['a', 'b', 'c']) == 'abc'
+    
+    # Test single string
+    assert concatenate(['hello']) == 'hello'
+    
+    # Test longer list
+    assert concatenate(['a', 'b', 'c', 'd', 'e']) == 'abcde'
+    
+    # Test strings with spaces
+    assert concatenate(['hello', ' ', 'world']) == 'hello world'
+
+
+if __name__ == '__main__':
+    test_concatenate()
+```

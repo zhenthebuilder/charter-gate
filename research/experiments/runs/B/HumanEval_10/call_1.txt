@@ -1,0 +1,76 @@
+Looking at this task, I need to implement `make_palindrome` following the algorithm described:
+
+1. Find the longest palindromic suffix of the string
+2. Extract the prefix (everything before that suffix)
+3. Reverse the prefix and append it to the original string
+
+Let me trace through an example to verify my understanding:
+- For `'cat'`: the longest palindromic suffix is `'t'` (length 1), prefix is `'ca'`, so append reverse of `'ca'` which is `'ac'` → `'catac'` ✓
+- For `'cata'`: the longest palindromic suffix is `'ata'` (length 3), prefix is `'c'`, so append reverse of `'c'` which is `'c'` → `'catac'` ✓
+
+### solution.py
+```python
+def is_palindrome(string: str) -> bool:
+    """ Test if given string is a palindrome """
+    return string == string[::-1]
+
+
+def make_palindrome(string: str) -> str:
+    """ Find the shortest palindrome that begins with a supplied string.
+    Algorithm idea is simple:
+    - Find the longest postfix of supplied string that is a palindrome.
+    - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.
+    >>> make_palindrome('')
+    ''
+    >>> make_palindrome('cat')
+    'catac'
+    >>> make_palindrome('cata')
+    'catac'
+    """
+    if not string:
+        return string
+    
+    for i in range(len(string)):
+        suffix = string[i:]
+        if is_palindrome(suffix):
+            prefix = string[:i]
+            return string + prefix[::-1]
+    
+    return string
+```
+
+### smoke_test.py
+```python
+from solution import make_palindrome
+
+def test_empty_string():
+    assert make_palindrome('') == ''
+
+def test_single_char():
+    assert make_palindrome('a') == 'a'
+
+def test_cat():
+    assert make_palindrome('cat') == 'catac'
+
+def test_cata():
+    assert make_palindrome('cata') == 'catac'
+
+def test_already_palindrome():
+    assert make_palindrome('aba') == 'aba'
+    assert make_palindrome('racecar') == 'racecar'
+
+def test_two_chars():
+    assert make_palindrome('ab') == 'aba'
+
+def test_longer_string():
+    assert make_palindrome('abcd') == 'abcdcba'
+
+if __name__ == '__main__':
+    test_empty_string()
+    test_single_char()
+    test_cat()
+    test_cata()
+    test_already_palindrome()
+    test_two_chars()
+    test_longer_string()
+```

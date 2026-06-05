@@ -1,0 +1,35 @@
+Looking at the error, the issue is a stray `python` token on line 2 of the previous solution.py file. The actual median implementation is correct—I just need to remove that syntax error.
+
+### solution.py
+```python
+def median(l: list):
+    """Return median of elements in the list l.
+    >>> median([3, 1, 2, 4, 5])
+    3
+    >>> median([-10, 4, 6, 1000, 10, 20])
+    15.0
+    """
+    sorted_list = sorted(l)
+    n = len(sorted_list)
+    if n % 2 == 1:
+        return sorted_list[n // 2]
+    else:
+        return (sorted_list[n // 2] + sorted_list[n // 2 + 1]) / 2
+```
+
+### smoke_test.py
+```python
+from solution import median
+
+# Test cases from docstring
+assert median([3, 1, 2, 4, 5]) == 3
+assert median([-10, 4, 6, 1000, 10, 20]) == 15.0
+
+# Additional test cases
+assert median([5]) == 5
+assert median([1, 2]) == 1.5
+assert median([1, 2, 3, 4]) == 2.5
+assert median([1, 2, 3, 4, 5, 6, 7]) == 4
+assert median([10, 20, 30]) == 20
+assert median([-5, -3, -1, 0, 1]) == -1
+```

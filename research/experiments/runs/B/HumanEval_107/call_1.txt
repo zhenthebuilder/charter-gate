@@ -1,0 +1,67 @@
+Looking at this task, I need to:
+1. Check if each number in the range is a palindrome
+2. Count how many are even and how many are odd
+3. Return the tuple (even_count, odd_count)
+
+A number is a palindrome if its string representation reads the same forwards and backwards.
+
+Let me verify with the examples:
+- n=3: palindromes are 1,2,3 → even: {2}=1, odd: {1,3}=2 → (1,2) ✓
+- n=12: palindromes are 1,2,3,4,5,6,7,8,9,11 (10 and 12 are not palindromes) → even: {2,4,6,8}=4, odd: {1,3,5,7,9,11}=6 → (4,6) ✓
+
+### solution.py
+```python
+def even_odd_palindrome(n):
+    """
+    Given a positive integer n, return a tuple that has the number of even and odd
+    integer palindromes that fall within the range(1, n), inclusive.
+
+    Example 1:
+
+        Input: 3
+        Output: (1, 2)
+        Explanation:
+        Integer palindrome are 1, 2, 3. one of them is even, and two of them are odd.
+
+    Example 2:
+
+        Input: 12
+        Output: (4, 6)
+        Explanation:
+        Integer palindrome are 1, 2, 3, 4, 5, 6, 7, 8, 9, 11. four of them are even, and 6 of them are odd.
+
+    Note:
+        1. 1 <= n <= 10^3
+        2. returned tuple has the number of even and odd integer palindromes respectively.
+    """
+    even_count = 0
+    odd_count = 0
+    
+    for i in range(1, n + 1):
+        s = str(i)
+        if s == s[::-1]:  # Check if palindrome
+            if i % 2 == 0:
+                even_count += 1
+            else:
+                odd_count += 1
+    
+    return (even_count, odd_count)
+```
+
+### smoke_test.py
+```python
+from solution import even_odd_palindrome
+
+# Test from docstring Example 1
+assert even_odd_palindrome(3) == (1, 2)
+
+# Test from docstring Example 2
+assert even_odd_palindrome(12) == (4, 6)
+
+# Additional test cases
+assert even_odd_palindrome(1) == (0, 1)  # only 1
+assert even_odd_palindrome(2) == (1, 1)  # 1, 2
+assert even_odd_palindrome(9) == (4, 5)  # all single digits: 2,4,6,8 vs 1,3,5,7,9
+assert even_odd_palindrome(11) == (4, 6)  # adds 11 (odd palindrome)
+assert even_odd_palindrome(100) == (8, 10)  # 1-9 + 11,22,33,44,55,66,77,88,99
+```

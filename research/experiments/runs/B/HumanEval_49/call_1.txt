@@ -1,0 +1,52 @@
+Looking at this task, I need to compute 2^n modulo p efficiently. The note about "be aware of numerics" suggests that for large n, we should use modular exponentiation rather than computing 2^n first (which could be huge).
+
+Python's built-in `pow(base, exp, mod)` function efficiently computes this using binary exponentiation.
+
+Let me verify with the docstring examples:
+- 2^3 % 5 = 8 % 5 = 3 ✓
+- 2^0 % 101 = 1 ✓
+- 2^3 % 11 = 8 ✓
+- 2^100 % 101 = 1 (by Fermat's Little Theorem: 2^(p-1) ≡ 1 mod p for prime p)
+- 2^1101 % 101 = 2^(11*100 + 1) % 101 = (2^100)^11 * 2 % 101 ≡ 1 * 2 = 2 ✓
+
+### solution.py
+```python
+def modp(n: int, p: int):
+    """Return 2^n modulo p (be aware of numerics).
+    >>> modp(3, 5)
+    3
+    >>> modp(1101, 101)
+    2
+    >>> modp(0, 101)
+    1
+    >>> modp(3, 11)
+    8
+    >>> modp(100, 101)
+    1
+    """
+    return pow(2, n, p)
+```
+
+### smoke_test.py
+```python
+from solution import modp
+
+def test_modp():
+    # Examples from docstring
+    assert modp(3, 5) == 3
+    assert modp(1101, 101) == 2
+    assert modp(0, 101) == 1
+    assert modp(3, 11) == 8
+    assert modp(100, 101) == 1
+    
+    # Additional test cases
+    assert modp(0, 5) == 1  # 2^0 = 1
+    assert modp(1, 5) == 2  # 2^1 = 2
+    assert modp(2, 5) == 4  # 2^2 = 4
+    assert modp(4, 5) == 1  # 2^4 = 16, 16 % 5 = 1
+    assert modp(5, 7) == 4  # 2^5 = 32, 32 % 7 = 4
+    assert modp(10, 1009) == pow(2, 10, 1009)  # Larger values
+
+if __name__ == "__main__":
+    test_modp()
+```

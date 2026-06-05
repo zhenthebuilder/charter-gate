@@ -1,0 +1,67 @@
+Looking at this problem:
+
+- The rabbit starts with `number` carrots already eaten
+- Needs to eat `need` more carrots
+- There are `remaining` carrots available
+- Return `[total_eaten, carrots_left]`
+
+The key logic: eat as much as possible (up to `need`), but limited by what's `remaining`.
+
+Let me trace through an example:
+- `eat(5, 6, 10)`: Have 5, need 6, 10 available → eat min(6, 10) = 6 → total = 5+6 = 11, left = 10-6 = 4 ✓
+
+### solution.py
+```python
+def eat(number, need, remaining):
+    """
+    You're a hungry rabbit, and you already have eaten a certain number of carrots,
+    but now you need to eat more carrots to complete the day's meals.
+    you should return an array of [ total number of eaten carrots after your meals,
+                                    the number of carrots left after your meals ]
+    if there are not enough remaining carrots, you will eat all remaining carrots, but will still be hungry.
+    
+    Example:
+    * eat(5, 6, 10) -> [11, 4]
+    * eat(4, 8, 9) -> [12, 1]
+    * eat(1, 10, 10) -> [11, 0]
+    * eat(2, 11, 5) -> [7, 0]
+    
+    Variables:
+    @number : integer
+        the number of carrots that you have eaten.
+    @need : integer
+        the number of carrots that you need to eat.
+    @remaining : integer
+        the number of remaining carrots thet exist in stock
+    
+    Constrain:
+    * 0 <= number <= 1000
+    * 0 <= need <= 1000
+    * 0 <= remaining <= 1000
+
+    Have fun :)
+    """
+    eaten = min(need, remaining)
+    total = number + eaten
+    left = remaining - eaten
+    return [total, left]
+```
+
+### smoke_test.py
+```python
+from solution import eat
+
+# Test docstring examples
+assert eat(5, 6, 10) == [11, 4]
+assert eat(4, 8, 9) == [12, 1]
+assert eat(1, 10, 10) == [11, 0]
+assert eat(2, 11, 5) == [7, 0]
+
+# Edge cases
+assert eat(0, 0, 0) == [0, 0]
+assert eat(0, 5, 0) == [0, 0]  # need > remaining, eat nothing
+assert eat(10, 0, 5) == [10, 5]  # need = 0, eat nothing
+assert eat(100, 50, 1000) == [150, 950]  # plenty available
+
+print("All tests passed!")
+```

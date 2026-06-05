@@ -1,0 +1,11 @@
+from solution import add
+
+# Test cases from docstring
+assert add(2, 3) == 5
+assert add(5, 7) == 12
+
+# Additional test cases
+assert add(0, 0) == 0
+assert add(-1, 1) == 0
+assert add(-5, -3) == -8
+assert add(10, -3) == 7

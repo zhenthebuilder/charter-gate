@@ -1,0 +1,49 @@
+Looking at this task, I need to:
+
+1. Check if n > m, return -1
+2. Calculate the average of n and m (the mean of the range n to m is just (n+m)/2)
+3. Round to nearest integer
+4. Convert to binary using `bin()`
+
+Let me verify with the examples:
+- `rounded_avg(1, 5)`: avg = (1+5)/2 = 3, bin(3) = "0b11" ✓
+- `rounded_avg(10, 20)`: avg = (10+20)/2 = 15, bin(15) = "0b1111" ✓  
+- `rounded_avg(20, 33)`: avg = (20+33)/2 = 26.5, round(26.5) = 26 (banker's rounding), bin(26) = "0b11010" ✓
+
+### solution.py
+```python
+def rounded_avg(n, m):
+    """You are given two positive integers n and m, and your task is to compute the
+    average of the integers from n through m (including n and m). 
+    Round the answer to the nearest integer and convert that to binary.
+    If n is greater than m, return -1.
+    Example:
+    rounded_avg(1, 5) => "0b11"
+    rounded_avg(7, 5) => -1
+    rounded_avg(10, 20) => "0b1111"
+    rounded_avg(20, 33) => "0b11010"
+    """
+    if n > m:
+        return -1
+    
+    avg = (n + m) / 2
+    rounded = round(avg)
+    return bin(rounded)
+```
+
+### smoke_test.py
+```python
+from solution import rounded_avg
+
+# Test cases from docstring
+assert rounded_avg(1, 5) == "0b11"
+assert rounded_avg(7, 5) == -1
+assert rounded_avg(10, 20) == "0b1111"
+assert rounded_avg(20, 33) == "0b11010"
+
+# Additional edge cases
+assert rounded_avg(1, 1) == "0b1"
+assert rounded_avg(1, 2) == "0b10"
+assert rounded_avg(2, 3) == "0b10"
+assert rounded_avg(3, 4) == "0b100"
+```

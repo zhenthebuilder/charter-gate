@@ -1,0 +1,76 @@
+Looking at this problem, I need to find the lexicographically smallest path of length k.
+
+**Key insights:**
+1. We must start with value 1 (smallest possible first element)
+2. At each subsequent step, to get the lexicographically smallest path, we should greedily move to the neighbor with the smallest value
+3. This greedy approach is optimal because if we deviate from picking the smallest neighbor at any step, our path will be lexicographically larger at that point
+
+**Why greedy works:** Suppose the optimal solution doesn't always pick the smallest neighbor at some step. Then at the first such step where greedy picks value u (smallest) but optimal picks value v > u, greedy's path would be lexicographically smaller, contradicting optimality.
+
+Let me trace through example 1:
+- Grid: `[[1,2,3], [4,5,6], [7,8,9]]`, k=3
+- Start at 1 (position 0,0)
+- Step 1: neighbors are 2(right) and 4(down), pick 2 → path=[1,2]
+- Step 2: from 2, neighbors are 1(left), 3(right), 5(down), pick 1 → path=[1,2,1]
+- Done! ✓
+
+### solution.py
+```python
+def minPath(grid, k):
+    n = len(grid)
+    
+    # Find position of 1
+    start_pos = None
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 1:
+                start_pos = (i, j)
+                break
+        if start_pos:
+            break
+    
+    path = [1]
+    pos = start_pos
+    
+    for _ in range(k - 1):
+        i, j = pos
+        neighbors = []
+        for di, dj in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            ni, nj = i + di, j + dj
+            if 0 <= ni < n and 0 <= nj < n:
+                neighbors.append((grid[ni][nj], (ni, nj)))
+        
+        # Greedily pick the smallest neighbor
+        val, next_pos = min(neighbors, key=lambda x: x[0])
+        path.append(val)
+        pos = next_pos
+    
+    return path
+```
+
+### smoke_test.py
+```python
+from solution import minPath
+
+# Example 1: grid = [[1,2,3], [4,5,6], [7,8,9]], k = 3
+grid1 = [[1,2,3], [4,5,6], [7,8,9]]
+assert minPath(grid1, 3) == [1, 2, 1]
+
+# Example 2: grid = [[5,9,3], [4,1,6], [7,8,2]], k = 1
+grid2 = [[5,9,3], [4,1,6], [7,8,2]]
+assert minPath(grid2, 1) == [1]
+
+# Additional test: k=2 with same grid
+assert minPath(grid1, 2) == [1, 2]
+
+# Additional test: k=4, path alternates between 1 and 2
+assert minPath(grid1, 4) == [1, 2, 1, 2]
+
+# Additional test: larger k
+assert minPath(grid1, 5) == [1, 2, 1, 2, 1]
+
+# Additional test: different grid
+grid3 = [[1, 2], [4, 3]]
+assert minPath(grid3, 2) == [1, 2]
+assert minPath(grid3, 3) == [1, 2, 1]
+```

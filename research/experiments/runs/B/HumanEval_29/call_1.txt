@@ -1,0 +1,34 @@
+### solution.py
+```python
+from typing import List
+
+
+def filter_by_prefix(strings: List[str], prefix: str) -> List[str]:
+    """ Filter an input list of strings only for ones that start with a given prefix.
+    >>> filter_by_prefix([], 'a')
+    []
+    >>> filter_by_prefix(['abc', 'bcd', 'cde', 'array'], 'a')
+    ['abc', 'array']
+    """
+    return [s for s in strings if s.startswith(prefix)]
+```
+
+### smoke_test.py
+```python
+from solution import filter_by_prefix
+
+# Docstring examples
+assert filter_by_prefix([], 'a') == []
+assert filter_by_prefix(['abc', 'bcd', 'cde', 'array'], 'a') == ['abc', 'array']
+
+# Additional cases
+assert filter_by_prefix(['apple', 'apricot', 'banana'], 'a') == ['apple', 'apricot']
+assert filter_by_prefix(['apple', 'apricot', 'banana'], 'b') == ['banana']
+assert filter_by_prefix(['apple', 'apricot', 'banana'], 'c') == []
+assert filter_by_prefix(['hello', 'world'], 'he') == ['hello']
+assert filter_by_prefix(['hello', 'world'], '') == ['hello', 'world']
+assert filter_by_prefix(['a', 'ab', 'abc'], 'a') == ['a', 'ab', 'abc']
+assert filter_by_prefix(['cat', 'car', 'dog'], 'ca') == ['cat', 'car']
+assert filter_by_prefix(['Apple', 'apple'], 'a') == ['apple']
+assert filter_by_prefix(['Apple', 'apple'], 'A') == ['Apple']
+```

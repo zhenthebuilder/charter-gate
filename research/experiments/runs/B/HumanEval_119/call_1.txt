@@ -1,0 +1,48 @@
+Looking at this problem, I need to:
+
+1. Check if two strings of parentheses can be concatenated (in either order) to form a balanced string
+2. A balanced string has equal `(` and `)`, and at no point while reading left-to-right should `)` count exceed `(` count
+
+**Strategy:**
+- Try both concatenation orders: `s1 + s2` and `s2 + s1`
+- For each, check if it's a "good" (balanced) string using a counter:
+  - Increment for `(`, decrement for `)`
+  - If counter goes negative, too many `)` seen too early → invalid
+  - Counter must end at 0
+
+### solution.py
+```python
+def match_parens(lst):
+    def is_good(s):
+        balance = 0
+        for char in s:
+            if char == '(':
+                balance += 1
+            else:  # char == ')'
+                balance -= 1
+            if balance < 0:
+                return False
+        return balance == 0
+    
+    if is_good(lst[0] + lst[1]) or is_good(lst[1] + lst[0]):
+        return 'Yes'
+    else:
+        return 'No'
+```
+
+### smoke_test.py
+```python
+from solution import match_parens
+
+# Examples from docstring
+assert match_parens(['()(', ')']) == 'Yes'
+assert match_parens([')', ')']) == 'No'
+
+# Extra test cases
+assert match_parens(['()', '()']) == 'Yes'
+assert match_parens(['((', '))']) == 'Yes'
+assert match_parens(['(', '(']) == 'No'
+assert match_parens([')', '(']) == 'Yes'
+assert match_parens(['(())', '(())']) == 'Yes'
+assert match_parens(['()', ')']) == 'No'
+```

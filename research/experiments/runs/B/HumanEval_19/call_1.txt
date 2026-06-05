@@ -1,0 +1,59 @@
+### solution.py
+```python
+from typing import List
+
+
+def sort_numbers(numbers: str) -> str:
+    """ Input is a space-delimited string of numberals from 'zero' to 'nine'.
+    Valid choices are 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight' and 'nine'.
+    Return the string with numbers sorted from smallest to largest
+    >>> sort_numbers('three one five')
+    'one three five'
+    """
+    word_to_num = {
+        'zero': 0,
+        'one': 1,
+        'two': 2,
+        'three': 3,
+        'four': 4,
+        'five': 5,
+        'six': 6,
+        'seven': 7,
+        'eight': 8,
+        'nine': 9
+    }
+    
+    num_to_word = {v: k for k, v in word_to_num.items()}
+    
+    words = numbers.split()
+    nums = [word_to_num[word] for word in words]
+    nums.sort()
+    
+    return ' '.join([num_to_word[num] for num in nums])
+```
+
+### smoke_test.py
+```python
+from solution import sort_numbers
+
+# Docstring example
+assert sort_numbers('three one five') == 'one three five'
+
+# Single number
+assert sort_numbers('five') == 'five'
+
+# Already sorted
+assert sort_numbers('one two three') == 'one two three'
+
+# Reverse sorted
+assert sort_numbers('nine eight seven') == 'seven eight nine'
+
+# Duplicates
+assert sort_numbers('five five five') == 'five five five'
+
+# All digits
+assert sort_numbers('zero one two three four five six seven eight nine') == 'zero one two three four five six seven eight nine'
+
+# Random order
+assert sort_numbers('nine two zero five eight') == 'zero two five eight nine'
+```

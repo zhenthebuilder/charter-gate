@@ -1,0 +1,49 @@
+Looking at the `encode_shift` function, it shifts each lowercase letter forward by 5 positions in the alphabet (wrapping around). To decode, I need to shift backward by 5 (or equivalently, forward by 21).
+
+Let me trace through the logic:
+- `encode_shift`: `(ord(ch) + 5 - ord("a")) % 26 + ord("a")`
+- `decode_shift`: `(ord(ch) - 5 - ord("a")) % 26 + ord("a")` (shift back by 5)
+
+For example: 'a' → 'f' when encoded, so 'f' → 'a' when decoded.
+
+### solution.py
+```python
+def decode_shift(s: str):
+    """
+    takes as input string encoded with encode_shift function. Returns decoded string.
+    """
+    return "".join([chr(((ord(ch) - 5 - ord("a")) % 26) + ord("a")) for ch in s])
+```
+
+### smoke_test.py
+```python
+from solution import decode_shift
+
+def encode_shift(s: str):
+    """Helper to verify decode_shift works correctly"""
+    return "".join([chr(((ord(ch) + 5 - ord("a")) % 26) + ord("a")) for ch in s])
+
+# Round-trip test: encoding then decoding should recover original
+assert decode_shift(encode_shift("hello")) == "hello"
+assert decode_shift(encode_shift("abc")) == "abc"
+assert decode_shift(encode_shift("xyz")) == "xyz"
+
+# All lowercase letters
+assert decode_shift(encode_shift("abcdefghijklmnopqrstuvwxyz")) == "abcdefghijklmnopqrstuvwxyz"
+
+# Edge cases
+assert decode_shift(encode_shift("")) == ""
+assert decode_shift(encode_shift("a")) == "a"
+assert decode_shift(encode_shift("z")) == "z"
+
+# Specific known mappings (encode_shift shifts by 5)
+# 'a' encodes to 'f', so 'f' should decode to 'a'
+assert decode_shift("f") == "a"
+# 'z' encodes to 'e' (wraps: 25+5=30, 30%26=4='e')
+assert decode_shift("e") == "z"
+# 'y' encodes to 'd' (wraps: 24+5=29, 29%26=3='d')
+assert decode_shift("d") == "y"
+
+# Multi-word test
+assert decode_shift(encode_shift("the quick brown fox")) == "the quick brown fox"
+```

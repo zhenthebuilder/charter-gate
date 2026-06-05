@@ -1,0 +1,55 @@
+Looking at this task, I need to:
+1. Find vowels that are sandwiched between two consonants
+2. Ignore vowels at the start and end of the word
+3. Return the vowel closest to the right side (iterate from right to left)
+
+Let me trace through an example: "yogurt"
+- From right: t(consonant), r(consonant), u(vowel ← between r and g), g(consonant)...
+- "u" is between consonants, so return "u" ✓
+
+### solution.py
+```python
+def get_closest_vowel(word):
+    """You are given a word. Your task is to find the closest vowel that stands between 
+    two consonants from the right side of the word (case sensitive).
+    
+    Vowels in the beginning and ending doesn't count. Return empty string if you didn't
+    find any vowel met the above condition. 
+
+    You may assume that the given string contains English letter only.
+
+    Example:
+    get_closest_vowel("yogurt") ==> "u"
+    get_closest_vowel("FULL") ==> "U"
+    get_closest_vowel("quick") ==> ""
+    get_closest_vowel("ab") ==> ""
+    """
+    vowels = set('aeiouAEIOU')
+    
+    # Iterate from right to left, skipping first and last characters
+    for i in range(len(word) - 2, 0, -1):
+        if word[i] in vowels:
+            # Check if both neighbors are consonants
+            if word[i-1] not in vowels and word[i+1] not in vowels:
+                return word[i]
+    
+    return ""
+```
+
+### smoke_test.py
+```python
+from solution import get_closest_vowel
+
+# Docstring examples
+assert get_closest_vowel("yogurt") == "u"
+assert get_closest_vowel("FULL") == "U"
+assert get_closest_vowel("quick") == ""
+assert get_closest_vowel("ab") == ""
+
+# Additional cases
+assert get_closest_vowel("reason") == "o"
+assert get_closest_vowel("testing") == "i"
+assert get_closest_vowel("bac") == "a"
+assert get_closest_vowel("aeiou") == ""
+assert get_closest_vowel("bcdfg") == ""
+```

@@ -1,0 +1,36 @@
+### solution.py
+```python
+def check_dict_case(dict):
+    if not dict:
+        return False
+    
+    if not all(isinstance(key, str) for key in dict.keys()):
+        return False
+    
+    all_lower = all(key.islower() for key in dict.keys())
+    all_upper = all(key.isupper() for key in dict.keys())
+    
+    return all_lower or all_upper
+```
+
+### smoke_test.py
+```python
+from solution import check_dict_case
+
+# Examples from docstring
+assert check_dict_case({"a":"apple", "b":"banana"}) == True
+assert check_dict_case({"a":"apple", "A":"banana", "B":"banana"}) == False
+assert check_dict_case({"a":"apple", 8:"banana", "a":"apple"}) == False
+assert check_dict_case({"Name":"John", "Age":"36", "City":"Houston"}) == False
+assert check_dict_case({"STATE":"NC", "ZIP":"12345"}) == True
+
+# Edge cases
+assert check_dict_case({}) == False
+assert check_dict_case({"x":"value"}) == True
+assert check_dict_case({"X":"value"}) == True
+assert check_dict_case({"a": 1, "b": 2}) == True
+assert check_dict_case({"A": 1, "B": 2}) == True
+assert check_dict_case({"a": "lowercase", "B": "mixed"}) == False
+assert check_dict_case({1: "value"}) == False
+assert check_dict_case({"a": "value", 1: "number"}) == False
+```

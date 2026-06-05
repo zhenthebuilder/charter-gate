@@ -1,0 +1,20 @@
+{
+ "calls": [
+  {
+   "idx": 1,
+   "model": "claude-haiku-4-5",
+   "seconds": 11.66,
+   "exit": 0,
+   "prompt_chars": 887,
+   "out_chars": 1167
+  },
+  {
+   "idx": 2,
+   "model": "claude-haiku-4-5",
+   "seconds": 8.26,
+   "exit": 0,
+   "prompt_chars": 2861,
+   "out_chars": 1638
+  }
+ ]
+}

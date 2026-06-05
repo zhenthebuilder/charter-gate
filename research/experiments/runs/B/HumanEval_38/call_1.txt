@@ -1,0 +1,57 @@
+Looking at `encode_cyclic`, I need to understand what it does:
+
+1. Splits the string into groups of 3 characters
+2. For each group of exactly 3 characters, it rotates left: `group[1:] + group[0]` (e.g., "abc" → "bca")
+3. Groups with fewer than 3 characters are left unchanged
+4. Joins all groups back together
+
+To decode, I need to reverse the rotation for 3-character groups. If encoding rotates left (moving first char to end), decoding rotates right (moving last char to front): `group[-1] + group[:-1]`.
+
+Let me verify with an example:
+- encode("abc") = "bca"
+- decode("bca") = "a" + "bc" = "abc" ✓
+
+### solution.py
+```python
+def decode_cyclic(s: str):
+    """
+    takes as input string encoded with encode_cyclic function. Returns decoded string.
+    """
+    # split string to groups. Each of length 3.
+    groups = [s[(3 * i):min((3 * i + 3), len(s))] for i in range((len(s) + 2) // 3)]
+    # reverse cycle elements in each group. Unless group has fewer elements than 3.
+    groups = [(group[-1] + group[:-1]) if len(group) == 3 else group for group in groups]
+    return "".join(groups)
+```
+
+### smoke_test.py
+```python
+from solution import decode_cyclic
+
+# Empty string
+assert decode_cyclic("") == ""
+
+# Single character (not rotated)
+assert decode_cyclic("a") == "a"
+
+# Two characters (not rotated)
+assert decode_cyclic("ab") == "ab"
+
+# Three characters (rotated: "abc" -> "bca")
+assert decode_cyclic("bca") == "abc"
+
+# Six characters: "abcdef" -> "bca" + "efd"
+assert decode_cyclic("bcaefd") == "abcdef"
+
+# Seven characters: "abcdefg" -> "bca" + "efd" + "g"
+assert decode_cyclic("bcaefdg") == "abcdefg"
+
+# Nine characters: "abcdefghi" -> "bca" + "efd" + "hig"
+assert decode_cyclic("bcaefdhig") == "abcdefghi"
+
+# Four characters: "abcd" -> "bca" + "d"
+assert decode_cyclic("bcad") == "abcd"
+
+# Five characters: "abcde" -> "bca" + "de"
+assert decode_cyclic("bcade") == "abcde"
+```

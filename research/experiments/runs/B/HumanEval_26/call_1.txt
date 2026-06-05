@@ -1,0 +1,47 @@
+### solution.py
+```python
+from typing import List
+from collections import Counter
+
+
+def remove_duplicates(numbers: List[int]) -> List[int]:
+    """ From a list of integers, remove all elements that occur more than once.
+    Keep order of elements left the same as in the input.
+    >>> remove_duplicates([1, 2, 3, 2, 4])
+    [1, 3, 4]
+    """
+    counts = Counter(numbers)
+    return [num for num in numbers if counts[num] == 1]
+```
+
+### smoke_test.py
+```python
+from solution import remove_duplicates
+
+
+def test_remove_duplicates():
+    # Example from docstring
+    assert remove_duplicates([1, 2, 3, 2, 4]) == [1, 3, 4]
+    
+    # Empty list
+    assert remove_duplicates([]) == []
+    
+    # No duplicates
+    assert remove_duplicates([1, 2, 3]) == [1, 2, 3]
+    
+    # All elements are duplicates
+    assert remove_duplicates([1, 1, 2, 2]) == []
+    
+    # Single element
+    assert remove_duplicates([5]) == [5]
+    
+    # Multiple duplicates of same element
+    assert remove_duplicates([1, 1, 1]) == []
+    
+    # Order preservation with mixed duplicates
+    assert remove_duplicates([3, 1, 2, 1, 3, 4]) == [2, 4]
+
+
+if __name__ == "__main__":
+    test_remove_duplicates()
+```

@@ -1,0 +1,24 @@
+[charter]
+name = "humaneval-HumanEval_11"
+
+[[deliverable]]
+id = "solution"
+path = "solution.py"
+min_bytes = 20
+must_match = ['def string_xor\(']
+
+[[deliverable]]
+id = "smoke"
+path = "smoke_test.py"
+min_bytes = 20
+must_match = ['(from solution import|import solution)']
+
+[[check]]
+id = "solution-parses"
+cmd = "python3 -c \"import ast; ast.parse(open('solution.py').read())\""
+timeout = 30
+
+[[check]]
+id = "smoke-passes"
+cmd = "python3 smoke_test.py"
+timeout = 60

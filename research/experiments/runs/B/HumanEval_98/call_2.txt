@@ -1,0 +1,49 @@
+Looking at the failure, the issue is in the smoke test, not the solution.
+
+Let me trace through `count_upper('EaIoU')`:
+- Index 0: 'E' (uppercase vowel) ✓
+- Index 2: 'I' (uppercase vowel) ✓
+- Index 4: 'U' (uppercase vowel) ✓
+
+The count should be **3**, not 2. The test comment says "E, I at indices 0, 2" but it's missing 'U' at index 4. The solution is correct; the test assertion is wrong.
+
+### solution.py
+```python
+def count_upper(s):
+    """
+    Given a string s, count the number of uppercase vowels in even indices.
+    
+    For example:
+    count_upper('aBCdEf') returns 1
+    count_upper('abcdefg') returns 0
+    count_upper('dBBE') returns 0
+    """
+    count = 0
+    vowels = set('AEIOU')
+    for i in range(0, len(s), 2):
+        if s[i] in vowels:
+            count += 1
+    return count
+```
+
+### smoke_test.py
+```python
+from solution import count_upper
+
+# Docstring examples
+assert count_upper('aBCdEf') == 1
+assert count_upper('abcdefg') == 0
+assert count_upper('dBBE') == 0
+
+# Edge cases
+assert count_upper('') == 0
+assert count_upper('A') == 1
+assert count_upper('a') == 0
+assert count_upper('B') == 0
+
+# Additional cases
+assert count_upper('AEIOU') == 3  # A, E, I at indices 0, 2, 4
+assert count_upper('AaEeIiOoUu') == 5  # uppercase vowels at all even indices
+assert count_upper('BCDFG') == 0
+assert count_upper('EaIoU') == 3  # E, I, U at indices 0, 2, 4
+```

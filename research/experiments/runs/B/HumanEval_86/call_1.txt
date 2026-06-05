@@ -1,0 +1,39 @@
+### solution.py
+```python
+def anti_shuffle(s):
+    """
+    Write a function that takes a string and returns an ordered version of it.
+    Ordered version of string, is a string where all words (separated by space)
+    are replaced by a new word where all the characters arranged in
+    ascending order based on ascii value.
+    Note: You should keep the order of words and blank spaces in the sentence.
+
+    For example:
+    anti_shuffle('Hi') returns 'Hi'
+    anti_shuffle('hello') returns 'ehllo'
+    anti_shuffle('Hello World!!!') returns 'Hello !!!Wdlor'
+    """
+    words = s.split(' ')
+    sorted_words = [''.join(sorted(word)) for word in words]
+    return ' '.join(sorted_words)
+```
+
+### smoke_test.py
+```python
+from solution import anti_shuffle
+
+# Examples from docstring
+assert anti_shuffle('Hi') == 'Hi'
+assert anti_shuffle('hello') == 'ehllo'
+assert anti_shuffle('Hello World!!!') == 'Hello !!!Wdlor'
+
+# Additional cases
+assert anti_shuffle('') == ''
+assert anti_shuffle('a') == 'a'
+assert anti_shuffle('abc') == 'abc'
+assert anti_shuffle('cba') == 'abc'
+assert anti_shuffle('a b c') == 'a b c'
+assert anti_shuffle('hello world') == 'ehllo dlorw'
+assert anti_shuffle('BbAa') == 'ABab'
+assert anti_shuffle('a  b') == 'a  b'
+```

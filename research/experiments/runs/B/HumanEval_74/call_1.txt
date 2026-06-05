@@ -1,0 +1,54 @@
+I'll solve this step by step.
+
+The task is to:
+1. Count total characters in all strings of each list
+2. Return the list with fewer total characters
+3. If equal, return the first list
+
+Let me trace an example:
+- `['hi', 'admin']` has 2+5 = 7 chars
+- `['hI', 'Hi']` has 2+2 = 4 chars
+- Return the second list since it has fewer
+
+### solution.py
+```python
+def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
+
+    if the two lists have the same number of chars, return the first list.
+
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+    sum1 = sum(len(s) for s in lst1)
+    sum2 = sum(len(s) for s in lst2)
+    
+    if sum1 <= sum2:
+        return lst1
+    else:
+        return lst2
+```
+
+### smoke_test.py
+```python
+from solution import total_match
+
+# Test examples from docstring
+assert total_match([], []) == []
+assert total_match(['hi', 'admin'], ['hI', 'Hi']) == ['hI', 'Hi']
+assert total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) == ['hi', 'admin']
+assert total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) == ['hI', 'hi', 'hi']
+assert total_match(['4'], ['1', '2', '3', '4', '5']) == ['4']
+
+# Additional edge cases
+assert total_match(['a'], ['b']) == ['a']  # Equal length, return first
+assert total_match(['ab'], ['a']) == ['a']  # Second has fewer
+assert total_match(['abc', 'def'], ['xy']) == ['xy']  # Second has fewer (2 vs 6)
+assert total_match(['x'], ['y', 'z']) == ['x']  # First has fewer (1 vs 2)
+```

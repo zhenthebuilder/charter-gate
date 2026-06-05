@@ -1,0 +1,58 @@
+Looking at the failing test case `'[[[]]'`, I can see the issue:
+
+The string `'[[[]]'` has 3 opening brackets and 2 closing brackets. A valid nested subsequence can be formed by taking the first two opens and the two closes: `[[]]`. This should return True.
+
+The current solution only checks for nesting when a complete balanced subsequence is found (`depth == 0`). But in `'[[[]]'`, we never reach `depth == 0` because there are unmatched brackets. The solution incorrectly returns False.
+
+The fix: Track the maximum depth reached throughout the entire string. If the maximum depth ever reaches 2 or higher, it means there was nesting at some point (one bracket pair inside another). We don't need to wait for complete balance—any time we have depth ≥ 2, nesting is proven.
+
+### solution.py
+```python
+def is_nested(string):
+    '''
+    Create a function that takes a string as input which contains only square brackets.
+    The function should return True if and only if there is a valid subsequence of brackets 
+    where at least one bracket in the subsequence is nested.
+
+    is_nested('[[]]') ➞ True
+    is_nested('[]]]]]]][[[[[]') ➞ False
+    is_nested('[][]') ➞ False
+    is_nested('[]') ➞ False
+    is_nested('[[][]]') ➞ True
+    is_nested('[[]][[') ➞ True
+    '''
+    depth = 0
+    max_depth = 0
+
+    for char in string:
+        if char == '[':
+            depth += 1
+            max_depth = max(max_depth, depth)
+        elif char == ']':
+            if depth > 0:
+                depth -= 1
+
+    return max_depth >= 2
+```
+
+### smoke_test.py
+```python
+from solution import is_nested
+
+assert is_nested('[[]]') == True, "Failed: [[]]"
+assert is_nested('[]]]]]]][[[[[]') == False, "Failed: []]]]]]][[[[[]"
+assert is_nested('[][]') == False, "Failed: [][]"
+assert is_nested('[]') == False, "Failed: []"
+assert is_nested('[[][]]') == True, "Failed: [[][]]"
+assert is_nested('[[]][[') == True, "Failed: [[]][["
+
+# Additional edge cases
+assert is_nested('') == False, "Failed: empty string"
+assert is_nested('[[[') == False, "Failed: unmatched open brackets"
+assert is_nested(']]]') == False, "Failed: unmatched close brackets"
+assert is_nested('[[[[[') == False, "Failed: all open brackets"
+assert is_nested('[[[]]') == True, "Failed: [[[]]"
+assert is_nested('[[[[]]]]') == True, "Failed: [[[[]]]]"
+assert is_nested('[][][]') == False, "Failed: [][][]"
+assert is_nested('[[[][]])') == True, "Failed: [[[][]]]"
+```

@@ -1,0 +1,64 @@
+Looking at this task, I need to implement `split_words` with three behaviors:
+1. If whitespace exists, split on whitespace
+2. Else if commas exist, split on commas
+3. Otherwise, count lowercase letters at odd positions in the alphabet (a=0, b=1, c=2, etc.)
+
+Let me trace through the examples:
+- "Hello world!" → has space → ["Hello", "world!"]
+- "Hello,world!" → no space, has comma → ["Hello", "world!"]
+- "abcdef" → no space/comma → count odd positions: b(1)✓, d(3)✓, f(5)✓ = 3
+
+### solution.py
+```python
+def split_words(txt):
+    if ' ' in txt:
+        return txt.split()
+    elif ',' in txt:
+        return txt.split(',')
+    else:
+        count = 0
+        for char in txt:
+            if char.islower():
+                position = ord(char) - ord('a')
+                if position % 2 == 1:
+                    count += 1
+        return count
+```
+
+### smoke_test.py
+```python
+from solution import split_words
+
+# From docstring examples
+assert split_words("Hello world!") == ["Hello", "world!"]
+assert split_words("Hello,world!") == ["Hello", "world!"]
+assert split_words("abcdef") == 3
+
+# Whitespace takes priority over commas
+assert split_words("a,b c,d") == ["a,b", "c,d"]
+
+# Only uppercase (no lowercase letters)
+assert split_words("ABCDEF") == 0
+
+# Mixed case - only count lowercase odd-positioned
+assert split_words("aBcDeF") == 3
+
+# Single characters
+assert split_words("b") == 1
+assert split_words("a") == 0
+
+# Multiple commas
+assert split_words("a,b,c") == ["a", "b", "c"]
+
+# Special characters only
+assert split_words("!@#$") == 0
+
+# All odd-positioned letters
+assert split_words("bdf") == 3
+
+# All even-positioned letters
+assert split_words("ace") == 0
+
+# Mixed odd and even
+assert split_words("abc") == 1
+```

@@ -1,0 +1,36 @@
+### solution.py
+```python
+from typing import List, Optional
+
+
+def longest(strings: List[str]) -> Optional[str]:
+    """ Out of list of strings, return the longest one. Return the first one in case of multiple
+    strings of the same length. Return None in case the input list is empty.
+    >>> longest([])
+
+    >>> longest(['a', 'b', 'c'])
+    'a'
+    >>> longest(['a', 'bb', 'ccc'])
+    'ccc'
+    """
+    if not strings:
+        return None
+    return max(strings, key=len)
+```
+
+### smoke_test.py
+```python
+from solution import longest
+
+# Docstring examples
+assert longest([]) is None
+assert longest(['a', 'b', 'c']) == 'a'
+assert longest(['a', 'bb', 'ccc']) == 'ccc'
+
+# Extra test cases
+assert longest(['x']) == 'x'
+assert longest(['hello', 'hi', 'hey', 'goodbye']) == 'goodbye'
+assert longest(['aa', 'bb', 'cc']) == 'aa'
+assert longest(['a', 'bb', 'c', 'ddd']) == 'ddd'
+assert longest(['world', 'hello']) == 'world'
+```

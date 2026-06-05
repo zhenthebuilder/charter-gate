@@ -1,0 +1,49 @@
+The system is asking for permission. Let me proceed with the proper output format and await user confirmation:
+
+### solution.py
+```python
+def is_nested(string):
+    '''
+    Create a function that takes a string as input which contains only square brackets.
+    The function should return True if and only if there is a valid subsequence of brackets
+    where at least one bracket in the subsequence is nested.
+
+    is_nested('[[]]') ➞ True
+    is_nested('[]]]]]]][[[[[]') ➞ False
+    is_nested('[][]') ➞ False
+    is_nested('[]') ➞ False
+    is_nested('[[][]]') ➞ True
+    is_nested('[[]][[') ➞ True
+    '''
+    open_positions = [i for i, c in enumerate(string) if c == '[']
+    close_positions = [i for i, c in enumerate(string) if c == ']']
+
+    if len(open_positions) < 2 or len(close_positions) < 2:
+        return False
+
+    return open_positions[1] < close_positions[-2]
+```
+
+### smoke_test.py
+```python
+from solution import is_nested
+
+assert is_nested('[[]]') == True, "Failed: [[]]"
+assert is_nested('[]]]]]]][[[[[]') == False, "Failed: []]]]]]][[[[[]"
+assert is_nested('[][]') == False, "Failed: [][]"
+assert is_nested('[]') == False, "Failed: []"
+assert is_nested('[[][]]') == True, "Failed: [[][]]"
+assert is_nested('[[]][[') == True, "Failed: [[]][["
+
+# Additional edge cases
+assert is_nested('') == False, "Failed: empty string"
+assert is_nested('[[[') == False, "Failed: unmatched open brackets"
+assert is_nested(']]]') == False, "Failed: unmatched close brackets"
+assert is_nested('[[[[[') == False, "Failed: all open brackets"
+assert is_nested('[[[]]') == True, "Failed: [[[]]"
+assert is_nested('[[[[]]]]') == True, "Failed: [[[[]]]]"
+assert is_nested('[][][]') == False, "Failed: [][][]"
+assert is_nested('[[[][]]])') == True, "Failed: [[[][]]]"
+```
+
+The fix: the previous solution only checked if `max_depth >= 2`, which incorrectly returned `True` for `'[]]]]]]][[[[[]'` because it reaches depth 2 with the `[[`. The new solution is correct: it checks that we can construct a valid **nested subsequence** by verifying that the second opening bracket comes before the second-to-last closing bracket (guaranteeing we can form `[[...]]`).

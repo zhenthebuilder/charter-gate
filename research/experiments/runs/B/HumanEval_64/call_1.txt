@@ -1,0 +1,58 @@
+Looking at this task, I need to implement `vowels_count` that:
+1. Counts vowels 'a', 'e', 'i', 'o', 'u' (case-insensitive)
+2. Counts 'y' only when it's at the end of the word
+
+Let me trace the examples:
+- "abcde": a=vowel, e=vowel → 2 ✓
+- "ACEDY": A=vowel, E=vowel, Y=at end so counts as vowel → 3 ✓
+
+### solution.py
+```python
+def vowels_count(s):
+    """Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count("abcde")
+    2
+    >>> vowels_count("ACEDY")
+    3
+    """
+    vowels = 'aeiou'
+    count = 0
+    s_lower = s.lower()
+    
+    for i, char in enumerate(s_lower):
+        if char in vowels:
+            count += 1
+        elif char == 'y' and i == len(s_lower) - 1:
+            count += 1
+    
+    return count
+```
+
+### smoke_test.py
+```python
+from solution import vowels_count
+
+# Docstring examples
+assert vowels_count("abcde") == 2
+assert vowels_count("ACEDY") == 3
+
+# Edge cases
+assert vowels_count("") == 0
+assert vowels_count("bcdfg") == 0
+assert vowels_count("aeiou") == 5
+assert vowels_count("y") == 1
+assert vowels_count("xyz") == 1  # y at end
+assert vowels_count("happy") == 2  # a + y at end
+assert vowels_count("yes") == 1  # e only (y not at end)
+assert vowels_count("rhythm") == 0  # y not at end, no other vowels
+assert vowels_count("day") == 2  # a + y at end
+assert vowels_count("beauty") == 4  # e, a, u, y at end
+assert vowels_count("gymnasium") == 3  # a, i, u (y not at end)
+assert vowels_count("copy") == 2  # o + y at end
+assert vowels_count("yellow") == 2  # e, o (y not at end)
+```

@@ -1,0 +1,47 @@
+Looking at this task, I need to:
+
+1. Calculate the strength of each extension as: (uppercase count) - (lowercase count)
+2. Find the extension with the highest strength (ties go to the first in the list)
+3. Return the formatted string with class name and extension
+
+Let me trace through the example: `Strongest_Extension('my_class', ['AA', 'Be', 'CC'])`
+- 'AA': 2 uppercase, 0 lowercase → strength = 2
+- 'Be': 1 uppercase, 1 lowercase → strength = 0  
+- 'CC': 2 uppercase, 0 lowercase → strength = 2
+
+'AA' and 'CC' tie at strength 2, but 'AA' comes first → return 'my_class.AA' ✓
+
+### solution.py
+```python
+def Strongest_Extension(class_name, extensions):
+    def calculate_strength(ext):
+        uppercase = sum(1 for c in ext if c.isupper())
+        lowercase = sum(1 for c in ext if c.islower())
+        return uppercase - lowercase
+    
+    strongest = max(extensions, key=calculate_strength)
+    return f"{class_name}.{strongest}"
+```
+
+### smoke_test.py
+```python
+from solution import Strongest_Extension
+
+# Docstring example 1
+assert Strongest_Extension('Slices', ['SErviNGSliCes', 'Cheese', 'StuFfed']) == 'Slices.SErviNGSliCes'
+
+# Docstring example 2
+assert Strongest_Extension('my_class', ['AA', 'Be', 'CC']) == 'my_class.AA'
+
+# Tie-breaking: same strength, pick first
+assert Strongest_Extension('Test', ['AAA', 'BBB']) == 'Test.AAA'
+
+# Single extension
+assert Strongest_Extension('Single', ['MyExt']) == 'Single.MyExt'
+
+# Negative strengths
+assert Strongest_Extension('Negative', ['aaa', 'bb', 'c']) == 'Negative.bb'
+
+# All lowercase
+assert Strongest_Extension('AllLower', ['abc', 'def']) == 'AllLower.abc'
+```

@@ -1,0 +1,66 @@
+Looking at this task, I need to:
+1. Swap case of all letters
+2. Replace each vowel with the letter 2 places ahead in the alphabet
+
+Let me trace through the vowel mappings:
+- a/A → c/C (position 0 → 2)
+- e/E → g/G (position 4 → 6)
+- i/I → k/K (position 8 → 10)
+- o/O → q/Q (position 14 → 16)
+- u/U → w/W (position 20 → 22)
+
+For example, `encode('test')`:
+- t → T (swap case)
+- e → G (replace with 'g', then swap case to uppercase)
+- s → S (swap case)
+- t → T (swap case)
+Result: `TGST` ✓
+
+For `encode('This is a message')`:
+- T → t, h → H, i → K (vowel → 'k', swap case), s → S, space, etc.
+Result: `tHKS KS C MGSSCGG` ✓
+
+### solution.py
+```python
+def encode(message):
+    vowel_map = {
+        'a': 'c', 'e': 'g', 'i': 'k', 'o': 'q', 'u': 'w',
+        'A': 'C', 'E': 'G', 'I': 'K', 'O': 'Q', 'U': 'W',
+    }
+    
+    return ''.join(
+        vowel_map[char].swapcase() if char in vowel_map else char.swapcase()
+        for char in message
+    )
+```
+
+### smoke_test.py
+```python
+from solution import encode
+
+# Test examples from docstring
+assert encode('test') == 'TGST'
+assert encode('This is a message') == 'tHKS KS C MGSSCGG'
+
+# Test individual vowels
+assert encode('a') == 'C'
+assert encode('A') == 'c'
+assert encode('e') == 'G'
+assert encode('E') == 'g'
+assert encode('i') == 'K'
+assert encode('I') == 'k'
+assert encode('o') == 'Q'
+assert encode('O') == 'q'
+assert encode('u') == 'W'
+assert encode('U') == 'w'
+
+# Test consonants (case swaps)
+assert encode('b') == 'B'
+assert encode('B') == 'b'
+
+# Test edge cases
+assert encode('') == ''
+assert encode('xyz') == 'XYZ'
+assert encode('aeiou') == 'CGKQW'
+assert encode('Hello') == 'hGLLQ'
+```

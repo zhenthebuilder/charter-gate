@@ -1,0 +1,46 @@
+Looking at this problem, I need to:
+1. Split the string by sentence delimiters (`.`, `?`, `!`)
+2. Count sentences that start with the word "I"
+3. Handle the "word boundary" correctly (so "Island" doesn't count, but "I'm" does)
+
+The key insight is using a word boundary regex to ensure "I" is a complete word, not just the start of another word like "Island".
+
+### solution.py
+```python
+import re
+
+def is_bored(S):
+    sentences = re.split(r'[.?!]', S)
+    
+    count = 0
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if sentence and re.match(r'^I\b', sentence):
+            count += 1
+    
+    return count
+```
+
+### smoke_test.py
+```python
+from solution import is_bored
+
+# Test cases from the docstring
+assert is_bored("Hello world") == 0
+assert is_bored("The sky is blue. The sun is shining. I love this weather") == 1
+
+# Additional test cases
+assert is_bored("I am happy") == 1
+assert is_bored("I. I. I.") == 3
+assert is_bored("Island") == 0
+assert is_bored("I'm happy") == 1
+assert is_bored("I am very happy. I am excited!") == 2
+assert is_bored("") == 0
+assert is_bored("I") == 1
+assert is_bored("I?") == 1
+assert is_bored("I!") == 1
+assert is_bored("Hi. I am here.") == 1
+assert is_bored("It is sunny. I like it.") == 1
+assert is_bored("Wow! I am impressed!") == 1
+assert is_bored("Island of happiness") == 0
+```

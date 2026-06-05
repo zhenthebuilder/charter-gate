@@ -1,0 +1,33 @@
+Looking at this task, I need to find the largest divisor of `n` that is smaller than `n`.
+
+The key insight is that if I find the **smallest** divisor of `n` (greater than 1), then `n` divided by that smallest divisor gives me the **largest** divisor smaller than `n`.
+
+For example: 15 = 3 × 5, where 3 is the smallest divisor, so 15÷3 = 5 is the largest divisor.
+
+I only need to check divisors up to √n to find the smallest one efficiently. If no divisor is found in that range, the number is prime and its largest divisor is 1.
+
+### solution.py
+```python
+def largest_divisor(n: int) -> int:
+    """For a given number n, find the largest number that divides n evenly, smaller than n
+    >>> largest_divisor(15)
+    5
+    """
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return n // i
+    return 1
+```
+
+### smoke_test.py
+```python
+from solution import largest_divisor
+
+assert largest_divisor(15) == 5
+assert largest_divisor(2) == 1
+assert largest_divisor(4) == 2
+assert largest_divisor(12) == 6
+assert largest_divisor(17) == 1
+assert largest_divisor(100) == 50
+assert largest_divisor(1000) == 500
+```

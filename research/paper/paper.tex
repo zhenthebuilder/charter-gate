@@ -1,0 +1,349 @@
+\documentclass{article}
+\PassOptionsToPackage{numbers}{natbib}
+\usepackage[preprint]{neurips_2025}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small, breaklines=true, frame=single, columns=fullflexible}
+
+% Every number below comes from experiments/analyze.py over committed raw logs.
+\input{numbers}
+
+\title{Deliverable Contracts for Long-Horizon Agents:\\
+Gating Agent Runs with Verify--Repair Loops and Tamper-Evident Audits}
+
+\author{%
+  Zhen Li\\
+  \texttt{zhen@repl.it}\\
+  \texttt{github.com/zhenthebuilder/charter-gate}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Long-horizon agent tasks rarely fail loudly. They fail by \emph{declaring victory}:
+the agent reports completion while deliverables are missing, malformed, or silently
+dropped. We propose governing agent work the way continuous integration governs human
+work --- by declaring the deliverables themselves as a machine-checkable
+\emph{contract}, gating every run through a bounded verify--repair loop, and recording
+each attempt in a hash-chained audit log. We implement this as \textsc{charter}, a
+single-file, dependency-free CLI that wraps \emph{any} agent invocable as a shell
+command. To anchor the mechanism on a public benchmark, we run a paired A/B on all 164
+HumanEval problems with a small model (\texttt{claude-haiku-4-5}): the baseline arm
+submits the model's first answer; the gated arm adds a contract requiring the solution
+to parse, define the entry point, and pass model-authored smoke tests derived
+\emph{only} from the public docstring, with at most two repair rounds. Hidden tests are
+never shown. Scored with the official HumanEval harness, accuracy is at ceiling and
+the gate's effect on pass@1 is small and not statistically significant
+(\numpAa\%\,$\rightarrow$\,\numpBb\%, +\numdeltapp{}pp, exact McNemar
+$p=\nummcnemarp$); we report this null result as such. What the run does establish
+is the gate's governance behaviour at low cost: it caught first-attempt contract
+breaches on $\numrepairedB+\numunresolvedB$ of \numntasks{} tasks, auto-repaired
+\numrepairedB{} of them, surfaced the remaining \numunresolvedB{} as an explicit
+nonzero-exit failure instead of a silent claim of completion, and broke nothing
+(\numbbroke{} regressions), at $\nummeancallsB\times$ the model calls of the
+baseline. We release the tool, the full raw logs, and the scoring pipeline; every
+number in this paper is generated directly from the committed artifacts.
+\end{abstract}
+
+\section{Introduction}
+
+Agents that work for minutes to hours produce \emph{deliverables}: files, patches,
+reports, passing test suites. The dominant failure mode in practice is not a crash but
+an unverified claim of completion --- the agent ``declares victory'' on deliverables
+that do not exist, do not pass, or quietly omit part of the task. Current mitigations
+are either \emph{post hoc} (offline evals, human review) or \emph{framework-bound}
+(bespoke verifier hooks inside a particular agent stack).
+
+Software engineering solved the same problem for humans decades ago: continuous
+integration. Nobody merges on the author's word; a declarative pipeline checks the
+deliverables and blocks on failure. We port this pattern to agent runs with three
+components:
+
+\begin{enumerate}
+\item \textbf{Contract.} A \texttt{charter.toml} file declares deliverables (paths and
+globs, minimum sizes and counts, required/forbidden regular expressions, freshness)
+and arbitrary executable acceptance checks (any command; exit 0 means pass).
+\item \textbf{Gate.} \texttt{charter run -- <agent command>} executes the agent,
+verifies the contract, and on breach re-invokes the agent with the structured
+violation report injected (via an environment variable pointing at the report), up to
+a bounded number of repair rounds.
+\item \textbf{Audit.} Every attempt appends a record to \texttt{.charter/audit.jsonl}
+containing the verdict and the SHA-256 of every deliverable, hash-chained to the
+previous record so after-the-fact tampering is detectable.
+\end{enumerate}
+
+The design is deliberately minimal: a single stdlib-only Python file, agnostic to the
+agent (anything that is a shell command), installable by a stranger in seconds. Our
+claim is not that contracts make a weak model strong; it is that an \emph{external,
+declarative} definition of ``done'' --- checked, retried, and logged outside the
+agent's own control --- converts silent victory declarations into either repaired
+deliverables or explicit, auditable breaches, and yields an evidence trail that an
+agent's self-report cannot provide. We evaluate both whether the gate is \emph{safe}
+(does it harm benchmark accuracy?) and what its governance loop actually does,
+reporting the accuracy comparison honestly as a null result at ceiling.
+
+\paragraph{Contributions.}
+(i) A problem framing: deliverable-contract governance for long-horizon agent runs,
+with contract, gate, and audit as separable components.
+(ii) \textsc{charter}, an open-source, dependency-free reference implementation.
+(iii) A paired A/B on a public benchmark (HumanEval, official scorer, $n=\numntasks$
+per arm) with a repair-loop ablation, withholding hidden tests from the model, with
+all raw logs and scoring code released --- including an honest null result on
+accuracy and a decomposition of what the gate's repairs actually changed.
+
+\section{Related Work}
+
+\textbf{Self-correction and self-refinement.} Prompting an LLM to critique and revise
+its own output (e.g., Self-Refine~\cite{madaan2023selfrefine},
+Reflexion~\cite{shinn2023reflexion}) improves some tasks, but the critic shares the
+generator's blind spots, and unguided self-correction can degrade
+performance~\cite{huang2024large}. Our gate differs in that the retry signal is an
+\emph{externally executed} contract verdict (parse checks, executed tests), not the
+model's opinion of itself.
+
+\textbf{Execution-guided code generation.} Using executable tests at generation time
+is well established: CodeT generates tests to select samples~\cite{chen2022codet},
+LEVER verifies with execution~\cite{ni2023lever}, and self-debugging feeds execution
+errors back to the model~\cite{chen2023selfdebug}. Our HumanEval arm B is an instance
+of this family; the contribution is not the specific signal but its packaging as a
+general, declarative, agent-agnostic contract that also covers non-code deliverables
+and produces an audit chain.
+
+\textbf{Agent evaluation harnesses.} SWE-bench~\cite{jimenez2024swebench},
+GAIA~\cite{mialon2023gaia}, and HumanEval~\cite{chen2021humaneval} score agent or
+model outputs offline against hidden references. Contracts are complementary: they
+run \emph{inline}, use only information the operator legitimately has (the spec), and
+gate the run rather than grade it afterwards.
+
+\textbf{Policy-as-code.} Declarative gates over artifacts are standard in
+infrastructure (OPA, branch protection, pre-commit). \textsc{charter} transplants
+that pattern to agent deliverables and adds the bounded repair loop and hash-chained
+attempt log.
+
+\section{The \textsc{charter} system}
+
+\subsection{Contract language}
+A contract is a TOML file with two block types. \texttt{[[deliverable]]} declares a
+path or glob with optional \texttt{min\_count}, \texttt{min\_bytes},
+\texttt{must\_match} / \texttt{must\_not\_match} regular expressions, and
+\texttt{max\_age\_minutes} (freshness). \texttt{[[check]]} declares an arbitrary
+command with a timeout; exit status 0 is a pass. \texttt{charter verify} evaluates
+all blocks, prints a human-readable and (optionally) JSON report, and exits nonzero
+on any breach --- making it directly usable as a CI step.
+
+\subsection{Verify--repair gate}
+\texttt{charter run --max-repairs $k$ -- <agent cmd>} executes the agent in the
+workspace, then verifies. On breach, it writes the violation report to a file, sets
+\texttt{CHARTER\_VIOLATIONS} to its path, and re-invokes the same agent command; a
+contract-aware driver includes the report (and its previous outputs) in the next
+prompt. The loop is bounded by $k$, so a contract that the agent cannot satisfy
+terminates with a nonzero exit rather than an infinite loop.
+
+\subsection{Tamper-evident audit}
+Each attempt appends \texttt{\{attempt, agent\_exit, ok, deliverable\_sha256s, prev\}}
+to \texttt{.charter/audit.jsonl}, where \texttt{prev} is the SHA-256 of the previous
+record; \texttt{charter log} re-verifies the chain. The operator can therefore prove
+which bytes the agent delivered on which attempt, and detect post-hoc modification of
+the log itself.
+
+\section{Experimental setup}
+
+\paragraph{Benchmark and model.} We use all \numntasks{} problems of
+HumanEval~\cite{chen2021humaneval} and score with the official open-source harness
+(vendored unmodified; the one documented line enabling execution is uncommented).
+The subject model is \texttt{claude-haiku-4-5} invoked through the \texttt{claude}
+CLI; we chose a small model because frontier models are near ceiling on HumanEval,
+which would make any gate effect unmeasurable. HumanEval is not itself long-horizon;
+we use it because its unit of evaluation \emph{is} a deliverable with an acceptance
+test, the property the gate targets, and because it admits official, local,
+reproducible scoring within our compute budget (Section~\ref{sec:limitations}
+discusses external validity).
+
+\paragraph{Conditions (paired, per task).}
+\textbf{A (baseline):} one model call; the produced \texttt{solution.py} is submitted
+as-is. \textbf{B (gated):} the same model and task prompt, but the model must produce
+both \texttt{solution.py} and \texttt{smoke\_test.py}, a self-contained test derived
+\emph{only} from the public docstring. A per-task contract requires: the solution
+file exists with the entry-point definition; it parses (\texttt{ast.parse}); the smoke
+test exists, imports the solution, and passes when executed. The gate runs with
+\texttt{--max-repairs 2}, so at most three model calls per task. \emph{The hidden
+HumanEval tests are never shown to the model or the contract in either arm.} The
+extra information available to arm B is exactly what an operator has: the spec and
+the ability to execute what the agent wrote.
+
+\paragraph{Scoring and statistics.} Official harness pass@1 per arm; Wilson 95\%
+confidence intervals; and, because the design is paired, an exact McNemar test
+(binomial test on discordant pairs). We additionally score \textbf{B$_0$}, arm B's
+first-attempt solutions re-extracted from the committed raw model outputs, which
+ablates the repair loop and separates the effect of the arm-B prompt (write tests
+alongside the solution) from the effect of verify--repair. All raw model outputs
+(\texttt{call\_n.txt}),
+per-task metadata, charter audit logs, official per-task verdicts, and the analysis
+script are committed; \texttt{experiments/analyze.py} regenerates every number in
+this section, including this paper's macro file.
+
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{Paired A/B on HumanEval ($n=\numntasks$ per arm), official scorer,
+\texttt{claude-haiku-4-5}. Arm B adds the \textsc{charter} gate (docstring-derived
+smoke tests, $\le 2$ repairs); hidden tests withheld in both arms. B$_0$ scores arm
+B's \emph{first-attempt} solutions (extracted from the committed raw outputs), i.e.
+arm B with the repair loop ablated.}
+\label{tab:main}
+\begin{tabular}{lcccc}
+\toprule
+Arm & pass@1 & 95\% CI & passed/$n$ & mean model calls \\
+\midrule
+A: single shot          & \numpAa\% & [\numciAlo, \numciAhi] & \numpassA/\numntasks & \nummeancallsA \\
+B$_0$: B without repairs & \numpBz\% & --- & \numpassBz/\numntasks & \nummeancallsA \\
+B: \textsc{charter} gate & \numpBb\% & [\numciBlo, \numciBhi] & \numpassB/\numntasks & \nummeancallsB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Accuracy: a null result at ceiling.} The baseline already passes
+\numpassA{} of \numntasks{} hidden test suites (\numpAa\%), leaving headroom of only
+four tasks. The gated arm passes \numpassB{} (+\numdeltapp{}pp). The paired
+decomposition shows \numbfixed{} task fixed and \numbbroke{} broken (exact McNemar
+$p=\nummcnemarp$): \emph{the accuracy difference is not statistically significant},
+and we report it as a null result. The B$_0$ ablation localises the single fixed task
+(HumanEval/92) to the arm-B \emph{prompt} (writing acceptance tests alongside the
+solution), not the repair loop: repairs changed \numrepairfixedhidden{} hidden-test
+outcomes (\numrepairbrokehidden{} regressions). A gate cannot add correctness that a
+near-ceiling model does not lack; measuring an accuracy effect would require a harder
+benchmark or weaker model, which we flag as future work rather than re-rolling the
+dice here.
+
+\paragraph{Governance behaviour: what the gate actually did.} Charter's audit chains
+decompose arm B: \numfirstpassB{} tasks satisfied the contract on the first attempt;
+\numrepairedB{} breached it and were auto-repaired within two rounds;
+\numunresolvedB{} ended with an unresolved breach, which the gate surfaced as a
+nonzero exit --- the operator-visible alternative to a silent victory declaration.
+Among the \numrepairedB{} repaired tasks, \numrepairedfalsealarm{} were
+\emph{false alarms} (the first-attempt solution already passed the hidden tests; the
+model's own smoke test was wrong, and the repair round fixed the test), while
+\numrepairedtruebug{} were genuine solution bugs that the bounded repair loop did not
+fix against hidden tests. The unresolved task's solution in fact passes the hidden
+tests (\numunresolvedhiddenpass/\numunresolvedB): the gate's verdicts are exactly as
+good as the contract, no better. Crucially, the gate is \emph{safe}: \numbbroke{}
+tasks regressed relative to baseline.
+
+\paragraph{Cost.} The gate cost $\nummeancallsB\times$ model calls
+(\numtotalcallsB{} total vs.\ 164) and raised mean per-task model latency from
+\nummeansecsA{}s to \nummeansecsB{}s --- the price of executing smoke tests and up to
+two repairs on the \numrepairedB$+$\numunresolvedB{} breaching tasks.
+
+\paragraph{Honest reading.} On this benchmark, with this model, the verify--repair
+gate bought no significant accuracy and mostly adjudicated the model's own buggy
+self-tests. What it provably delivered --- visible in the committed audit chains ---
+is the governance contract: every task ended either contract-satisfied or with an
+explicit, machine-readable breach, with zero regressions and a 12\% call overhead.
+We consider publishing the null accuracy result alongside the mechanism more useful
+to practitioners than a benchmark cherry-picked to flatter the gate.
+
+\section{Dogfooding: governing this project's own deliverables}
+The repository's root \texttt{charter.toml} declares this project's five contracted
+deliverables (deployable CLI, this paper compiled from auto-generated numbers, the
+benchmark's raw logs and official scores, a marketing plan, and a static landing
+page) with size, pattern, and count constraints plus executable checks --- including
+one that re-runs the analysis script. \texttt{charter verify} passes on the released
+revision; the audit chain for the benchmark runs is included. This is anecdotal
+rather than experimental evidence, but it demonstrates the intended long-horizon use:
+the contract was written before the deliverables existed and gated the run that
+produced them.
+
+\section{Limitations}
+\label{sec:limitations}
+
+\textbf{Ceiling effect / null accuracy result.} \texttt{claude-haiku-4-5} passes
+\numpAa\% of HumanEval single-shot, leaving four tasks of headroom; no gate could
+show a meaningful accuracy effect in this regime, and ours did not. The accuracy
+claim of this paper is therefore only ``the gate does no harm'' (\numbbroke{}
+regressions); any positive accuracy claim needs a harder benchmark (SWE-bench Lite
+with a full scaffold is the natural next step) or a weaker model.
+\textbf{Self-verification quality.} The gate is only as good as the contract. Here
+\numrepairedfalsealarm{} of \numrepairedB{} repairs fixed the model's own buggy
+smoke test rather than the solution, and the one unresolved breach was itself a
+false alarm; docstring examples also partially overlap hidden tests. Operators who
+write their own acceptance checks (the intended deployment) sidestep the
+self-authored-test failure mode but inherit contract-authoring cost.
+\textbf{External validity.} HumanEval is short-horizon and single-file; it anchors
+the gate's mechanics on a public, officially-scored benchmark, not the full
+long-horizon claim. \textbf{Single model, single benchmark, $n=1$ run per arm; no
+variance estimate across reruns.} \textbf{Scope.} Contracts check artifacts, not
+intent; a malicious agent could satisfy the letter of a weak contract. The audit
+chain is tamper-\emph{evident}, not tamper-\emph{proof}.
+
+\section{Conclusion}
+Treating ``done'' as a contract --- declared outside the agent, verified by
+execution, retried under a bound, and logged in a tamper-evident chain --- is a
+cheap, agent-agnostic way to govern the deliverables of long-horizon agent runs. On
+a public benchmark at ceiling, the gate changed accuracy by a statistically
+insignificant amount (reported here as a null result) while doing what governance
+tooling must do: it converted every run into either a contract-satisfied deliverable
+or an explicit, auditable breach, broke nothing, and cost 12\% extra model calls.
+The tool, the full raw logs, and the analysis that generated every number above are
+public: \url{https://github.com/zhenthebuilder/charter-gate}.
+
+\begin{thebibliography}{9}
+
+\bibitem{chen2021humaneval}
+M. Chen et al.
+\newblock Evaluating large language models trained on code.
+\newblock \emph{arXiv:2107.03374}, 2021.
+
+\bibitem{madaan2023selfrefine}
+A. Madaan et al.
+\newblock Self-Refine: Iterative refinement with self-feedback.
+\newblock In \emph{NeurIPS}, 2023.
+
+\bibitem{shinn2023reflexion}
+N. Shinn et al.
+\newblock Reflexion: Language agents with verbal reinforcement learning.
+\newblock In \emph{NeurIPS}, 2023.
+
+\bibitem{huang2024large}
+J. Huang et al.
+\newblock Large language models cannot self-correct reasoning yet.
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem{chen2022codet}
+B. Chen et al.
+\newblock CodeT: Code generation with generated tests.
+\newblock In \emph{ICLR}, 2023.
+
+\bibitem{ni2023lever}
+A. Ni et al.
+\newblock LEVER: Learning to verify language-to-code generation with execution.
+\newblock In \emph{ICML}, 2023.
+
+\bibitem{chen2023selfdebug}
+X. Chen, M. Lin, N. Sch\"arli, and D. Zhou.
+\newblock Teaching large language models to self-debug.
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem{jimenez2024swebench}
+C. Jimenez et al.
+\newblock SWE-bench: Can language models resolve real-world GitHub issues?
+\newblock In \emph{ICLR}, 2024.
+
+\bibitem{mialon2023gaia}
+G. Mialon et al.
+\newblock GAIA: A benchmark for general AI assistants.
+\newblock In \emph{ICLR}, 2024.
+
+\end{thebibliography}
+
+\end{document}

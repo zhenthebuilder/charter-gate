@@ -1,0 +1,16 @@
+from solution import numerical_letter_grade
+
+assert numerical_letter_grade([4.0, 3, 1.7, 2, 3.5]) == ['A+', 'B', 'C-', 'C', 'A-']
+assert numerical_letter_grade([4.0]) == ['A+']
+assert numerical_letter_grade([3.9]) == ['A']
+assert numerical_letter_grade([3.5]) == ['A-']
+assert numerical_letter_grade([3.1]) == ['B+']
+assert numerical_letter_grade([2.8]) == ['B']
+assert numerical_letter_grade([2.4]) == ['B-']
+assert numerical_letter_grade([2.1]) == ['C+']
+assert numerical_letter_grade([1.8]) == ['C']
+assert numerical_letter_grade([1.4]) == ['C-']
+assert numerical_letter_grade([1.1]) == ['D+']
+assert numerical_letter_grade([0.8]) == ['D']
+assert numerical_letter_grade([0.1]) == ['D-']
+assert numerical_letter_grade([0.0]) == ['E']

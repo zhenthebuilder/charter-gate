@@ -1,0 +1,60 @@
+Looking at this problem, I need to:
+
+1. Define the ordered list of planets
+2. Find the positions of both input planets
+3. Return all planets between them (excluding the endpoints) in order
+4. Handle invalid planet names by returning an empty tuple
+
+Let me trace through an example:
+- `bf("Jupiter", "Neptune")`: Jupiter is at index 4, Neptune is at index 7, so return planets[5:7] = ("Saturn", "Uranus") ✓
+
+### solution.py
+```python
+def bf(planet1, planet2):
+    planets = ("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune")
+    
+    try:
+        idx1 = planets.index(planet1)
+        idx2 = planets.index(planet2)
+    except ValueError:
+        return ()
+    
+    start = min(idx1, idx2)
+    end = max(idx1, idx2)
+    
+    return planets[start + 1:end]
+```
+
+### smoke_test.py
+```python
+from solution import bf
+
+# Test examples from docstring
+assert bf("Jupiter", "Neptune") == ("Saturn", "Uranus")
+assert bf("Earth", "Mercury") == ("Venus",)
+assert bf("Mercury", "Uranus") == ("Venus", "Earth", "Mars", "Jupiter", "Saturn")
+
+# Test invalid planet names
+assert bf("Jupiter", "InvalidPlanet") == ()
+assert bf("InvalidPlanet", "Jupiter") == ()
+assert bf("Pluto", "Earth") == ()
+
+# Test adjacent planets (nothing between them)
+assert bf("Mercury", "Venus") == ()
+assert bf("Saturn", "Uranus") == ()
+
+# Test same planet
+assert bf("Earth", "Earth") == ()
+
+# Test reversed order (should give same result)
+assert bf("Neptune", "Jupiter") == ("Saturn", "Uranus")
+assert bf("Mercury", "Earth") == ("Venus",)
+
+# Test larger ranges
+assert bf("Mercury", "Neptune") == ("Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus")
+assert bf("Venus", "Saturn") == ("Earth", "Mars", "Jupiter")
+
+# Test with first and last planets
+assert bf("Mercury", "Mars") == ("Venus", "Earth")
+assert bf("Uranus", "Mercury") == ("Venus", "Earth", "Mars", "Jupiter", "Saturn")
+```

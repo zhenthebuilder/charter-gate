@@ -1,0 +1,67 @@
+Looking at this problem, I need to:
+1. Understand that we create an array where a[i] = i² - i + 1 for i from 1 to n
+2. Count triples where the sum is divisible by 3
+
+Let me analyze the pattern of remainders when divided by 3:
+
+For the formula i² - i + 1:
+- When i ≡ 0 (mod 3): a[i] ≡ 0 - 0 + 1 ≡ 1 (mod 3)
+- When i ≡ 1 (mod 3): a[i] ≡ 1 - 1 + 1 ≡ 1 (mod 3)  
+- When i ≡ 2 (mod 3): a[i] ≡ 4 - 2 + 1 ≡ 1 - 2 + 1 ≡ 0 (mod 3)
+
+So elements have only remainders 0 or 1 when divided by 3.
+
+For a sum of three numbers to be divisible by 3, we need:
+- All three remainders are 0: C(count₀, 3)
+- All three remainders are 1: C(count₁, 3)
+
+For n=5: [1, 3, 7, 13, 21] with remainders [1, 0, 1, 1, 0]
+- count₀ = 2, count₁ = 3
+- C(2,3) + C(3,3) = 0 + 1 = 1 ✓
+
+### solution.py
+```python
+def get_max_triples(n):
+    """
+    You are given a positive integer n. You have to create an integer array a of length n.
+    For each i (1 ≤ i ≤ n), the value of a[i] = i * i - i + 1.
+    Return the number of triples (a[i], a[j], a[k]) of a where i < j < k, 
+    and a[i] + a[j] + a[k] is a multiple of 3.
+
+    Example :
+        Input: n = 5
+        Output: 1
+        Explanation: 
+        a = [1, 3, 7, 13, 21]
+        The only valid triple is (1, 7, 13).
+    """
+    # a[i] % 3 depends on i % 3:
+    # i % 3 == 0 or 1 => a[i] % 3 == 1
+    # i % 3 == 2 => a[i] % 3 == 0
+    
+    count0 = (n + 1) // 3  # Count where i % 3 == 2
+    count1 = n - count0     # Count where i % 3 == 0 or 1
+    
+    # Triples sum to 0 (mod 3) when all three have same remainder
+    def comb_3(k):
+        if k < 3:
+            return 0
+        return k * (k - 1) * (k - 2) // 6
+    
+    return comb_3(count0) + comb_3(count1)
+```
+
+### smoke_test.py
+```python
+from solution import get_max_triples
+
+assert get_max_triples(1) == 0
+assert get_max_triples(2) == 0
+assert get_max_triples(3) == 0
+assert get_max_triples(4) == 1
+assert get_max_triples(5) == 1
+assert get_max_triples(6) == 4
+assert get_max_triples(7) == 10
+assert get_max_triples(8) == 11
+assert get_max_triples(9) == 21
+```

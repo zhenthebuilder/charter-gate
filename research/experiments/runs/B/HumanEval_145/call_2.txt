@@ -1,0 +1,40 @@
+Looking at the failing test, I need to trace through the logic:
+
+```
+assert order_by_points([100, 2]) == [2, 100]
+```
+
+Let me calculate digit sums:
+- `100`: `1 + 0 + 0 = 1`
+- `2`: `2`
+
+The docstring says to sort in **ascending order** by digit sum. Since `1 < 2`, the correct output should be `[100, 2]`, not `[2, 100]`.
+
+The test contradicts the docstring specification, so I'll fix the test. I'll verify the other test cases work with this understanding:
+- `[5, 15, 10]`: digit sums are `5, 6, 1` → sorted `[10, 5, 15]` ✓
+- `[-1, -11, 1, 11, -12]`: digit sums `1,2,1,2,3` with indices → sorted by (sum, index) → `[-1, 1, -11, 11, -12]` ✓
+
+### solution.py
+```python
+def order_by_points(nums):
+    def digit_sum(n):
+        return sum(int(d) for d in str(abs(n)))
+    
+    indexed = list(enumerate(nums))
+    indexed.sort(key=lambda x: (digit_sum(x[1]), x[0]))
+    return [x[1] for x in indexed]
+```
+
+### smoke_test.py
+```python
+from solution import order_by_points
+
+assert order_by_points([]) == []
+assert order_by_points([5]) == [5]
+assert order_by_points([1, 11, 111]) == [1, 11, 111]
+assert order_by_points([100, 2]) == [100, 2]
+assert order_by_points([1, -1]) == [1, -1]
+assert order_by_points([11, 20]) == [11, 20]
+assert order_by_points([5, 15, 10]) == [10, 5, 15]
+assert order_by_points([-1, -11, 1, 11, -12]) == [-1, 1, -11, 11, -12]
+```

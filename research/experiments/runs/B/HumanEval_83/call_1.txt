@@ -1,0 +1,52 @@
+Looking at this problem, I need to count n-digit positive integers that start with 1 OR end with 1.
+
+I'll use the inclusion-exclusion principle:
+- **Count = (start with 1) + (end with 1) - (both start and end with 1)**
+
+For n-digit numbers:
+- **Start with 1**: First digit is fixed to 1, remaining (n-1) digits are 0-9 each → 10^(n-1) numbers
+- **End with 1**: Last digit is fixed to 1, first digit is 1-9 (9 choices), middle (n-2) digits are 0-9 each → 9 × 10^(n-2) numbers (for n ≥ 2)
+- **Both**: First and last are 1, middle (n-2) digits are 0-9 each → 10^(n-2) numbers (for n ≥ 2)
+
+For n=1, there's only the digit 1, so the count is 1.
+
+For n ≥ 2:
+- Count = 10^(n-1) + 9 × 10^(n-2) - 10^(n-2) = 10^(n-1) + 8 × 10^(n-2) = **18 × 10^(n-2)**
+
+Verification:
+- n=1: 1 (just the number 1)
+- n=2: 18 × 10^0 = 18 (numbers 10-19 start with 1, plus 21,31,...,91 end with 1, minus overlap of 11 = 10+9-1)
+- n=3: 18 × 10^1 = 180 ✓
+
+### solution.py
+```python
+def starts_one_ends(n):
+    """
+    Given a positive integer n, return the count of the numbers of n-digit
+    positive integers that start or end with 1.
+    """
+    if n == 1:
+        return 1
+    return 18 * 10 ** (n - 2)
+```
+
+### smoke_test.py
+```python
+from solution import starts_one_ends
+
+# Test n=1: only the number 1
+assert starts_one_ends(1) == 1
+
+# Test n=2: numbers starting with 1 (10-19) plus those ending with 1 (x1) minus overlap
+# 10,11,12,...,19 (10) + 21,31,41,51,61,71,81,91 (8) + overlap 11 (already counted)
+assert starts_one_ends(2) == 18
+
+# Test n=3: 100-199 (100) + numbers ending with 1 (9*10=90) - overlap (10) = 180
+assert starts_one_ends(3) == 180
+
+# Test n=4: formula gives 18 * 10^2 = 1800
+assert starts_one_ends(4) == 1800
+
+# Test n=5: formula gives 18 * 10^3 = 18000
+assert starts_one_ends(5) == 18000
+```

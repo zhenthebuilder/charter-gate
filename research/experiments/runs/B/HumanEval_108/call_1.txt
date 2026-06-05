@@ -1,0 +1,59 @@
+Looking at this task, I need to:
+1. Calculate the sum of signed digits for each number
+2. For negative numbers, make the first digit negative, rest positive
+3. Count how many elements have a digit sum > 0
+
+Let me trace through the examples to verify my understanding:
+- `-1`: signed digits are `-1`, sum = -1 (not > 0)
+- `11`: signed digits are `1, 1`, sum = 2 (> 0) ✓
+- `-11`: signed digits are `-1, 1`, sum = 0 (not > 0)
+- Result: 1 ✓
+
+- `-123`: signed digits are `-1, 2, 3`, sum = 4 (> 0) ✓
+
+### solution.py
+```python
+def count_nums(arr):
+    """
+    Write a function count_nums which takes an array of integers and returns
+    the number of elements which has a sum of digits > 0.
+    If a number is negative, then its first signed digit will be negative:
+    e.g. -123 has signed digits -1, 2, and 3.
+    >>> count_nums([]) == 0
+    >>> count_nums([-1, 11, -11]) == 1
+    >>> count_nums([1, 1, 2]) == 3
+    """
+    count = 0
+    for num in arr:
+        if num < 0:
+            s = str(num)[1:]
+            digit_sum = -int(s[0])
+            for digit in s[1:]:
+                digit_sum += int(digit)
+        else:
+            digit_sum = sum(int(d) for d in str(num))
+        
+        if digit_sum > 0:
+            count += 1
+    
+    return count
+```
+
+### smoke_test.py
+```python
+from solution import count_nums
+
+# Docstring examples
+assert count_nums([]) == 0
+assert count_nums([-1, 11, -11]) == 1
+assert count_nums([1, 1, 2]) == 3
+
+# Additional cases from specification
+assert count_nums([-123]) == 1   # -1 + 2 + 3 = 4 > 0
+assert count_nums([-10]) == 0    # -1 + 0 = -1, not > 0
+assert count_nums([0]) == 0      # 0, not > 0
+assert count_nums([5]) == 1      # 5 > 0
+assert count_nums([-9, 9]) == 1  # -9 sum=-9, 9 sum=9
+assert count_nums([100, -100]) == 1  # 100 sum=1, -100 sum=-1
+assert count_nums([-99]) == 0    # -9 + 9 = 0, not > 0
+```

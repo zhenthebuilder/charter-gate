@@ -1,0 +1,14 @@
+```python
+def is_nested(string):
+    opening_positions = [i for i, ch in enumerate(string) if ch == '[']
+    closing_positions = [i for i, ch in enumerate(string) if ch == ']']
+    
+    for i in range(len(opening_positions) - 1):
+        for j in range(i + 1, len(opening_positions)):
+            second_opening = opening_positions[j]
+            closing_after = sum(1 for c in closing_positions if c > second_opening)
+            if closing_after >= 2:
+                return True
+    
+    return False
+```

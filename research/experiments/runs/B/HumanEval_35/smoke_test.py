@@ -1,0 +1,12 @@
+from solution import max_element
+
+# Test cases from docstring
+assert max_element([1, 2, 3]) == 3
+assert max_element([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10]) == 123
+
+# Additional test cases
+assert max_element([5]) == 5
+assert max_element([-1, -2, -3]) == -1
+assert max_element([0, 1, 2]) == 2
+assert max_element([1, 3, 3, 2]) == 3
+assert max_element([10, 5, 15, 3]) == 15
