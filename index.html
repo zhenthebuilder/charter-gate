@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>charter — deliverable contracts for AI agents</title>
+<style>
+  :root { --ink:#1a1d23; --sub:#5c6470; --bg:#fbfaf7; --card:#ffffff; --acc:#0a6b4f; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); }
+  .wrap { max-width:860px; margin:0 auto; padding:0 24px; }
+  header { padding:72px 0 40px; }
+  h1 { font-size:44px; line-height:1.15; margin:0 0 16px; letter-spacing:-0.02em; }
+  h1 .gate { color:var(--acc); }
+  .tag { font-size:20px; color:var(--sub); max-width:640px; margin:0 0 28px; }
+  pre { background:#11151a; color:#e8edf2; padding:18px 20px; border-radius:10px; overflow-x:auto; font-family:var(--mono); font-size:14.5px; line-height:1.55; }
+  pre .c { color:#7e8b99; }
+  .cta { display:flex; gap:12px; flex-wrap:wrap; margin:20px 0 0; }
+  .btn { display:inline-block; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; }
+  .btn.primary { background:var(--acc); color:#fff; }
+  .btn.ghost { border:1.5px solid var(--acc); color:var(--acc); }
+  section { padding:36px 0; border-top:1px solid #e8e4dc; }
+  h2 { font-size:26px; margin:0 0 14px; letter-spacing:-0.01em; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-top:18px; }
+  .card { background:var(--card); border:1px solid #e8e4dc; border-radius:12px; padding:18px 20px; }
+  .card h3 { margin:0 0 8px; font-size:17px; }
+  .card p { margin:0; font-size:15px; color:var(--sub); }
+  .num { font-size:34px; font-weight:700; color:var(--acc); }
+  .small { font-size:14px; color:var(--sub); }
+  footer { padding:36px 0 56px; border-top:1px solid #e8e4dc; color:var(--sub); font-size:14px; }
+  a { color:var(--acc); }
+  code { font-family:var(--mono); font-size:0.92em; background:#efece6; padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Your agent says it's done.<br><span class="gate">charter</span> checks.</h1>
+  <p class="tag">Long-horizon agent tasks rarely fail loudly — they fail by declaring
+  victory on deliverables that don't exist, don't pass, or were silently dropped.
+  <strong>charter</strong> turns "done" into a machine-checkable contract, gates every
+  agent run through a bounded verify→repair loop, and keeps a tamper-evident audit
+  trail. Like CI, but for agent deliverables.</p>
+
+  <pre><span class="c"># try it in under a minute — zero dependencies, single file, stdlib-only Python ≥3.11</span>
+uvx --from git+https://github.com/zhenthebuilder/charter-gate charter --help</pre>
+
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/zhenthebuilder/charter-gate">Get charter on GitHub</a>
+    <a class="btn ghost" href="https://github.com/zhenthebuilder/charter-gate#readme">Read the docs</a>
+  </div>
+</header>
+
+<section>
+  <h2>How it works</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>1 · Contract</h3>
+      <p>Declare deliverables in <code>charter.toml</code>: paths and globs, size floors,
+      required / forbidden patterns, freshness — plus arbitrary acceptance commands
+      (exit 0 = pass).</p>
+    </div>
+    <div class="card">
+      <h3>2 · Gate</h3>
+      <p><code>charter run -- &lt;any agent command&gt;</code> runs your agent, verifies the
+      contract, and on breach re-invokes the agent with the violation report injected.
+      Bounded repairs, no infinite loops.</p>
+    </div>
+    <div class="card">
+      <h3>3 · Audit</h3>
+      <p>Every attempt is appended to a hash-chained <code>.charter/audit.jsonl</code>
+      with SHA-256 of each deliverable — prove what the agent produced, when, and
+      detect tampering after the fact.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>It works with any agent</h2>
+  <p>If your agent is a shell command, charter can govern it — Claude Code, Codex,
+  a Python script, a Makefile target:</p>
+  <pre>charter init                       <span class="c"># scaffold charter.toml</span>
+charter verify                     <span class="c"># exit 0 iff the contract is satisfied</span>
+charter run --max-repairs 2 -- \
+  claude -p "Do the task. Fix every violation in the report if one is injected."
+charter log                        <span class="c"># tamper-evident audit trail</span></pre>
+</section>
+
+<section>
+  <h2>Measured, not vibes</h2>
+  <p>We A/B-tested the charter gate on all 164 problems of <strong>HumanEval</strong>
+  (official OpenAI scoring harness, hidden tests never shown to the model): same model,
+  same prompt — the only difference is a deliverable contract with a verify→repair
+  loop on the B arm. Full raw logs, scoring code, and a NeurIPS-style paper are in the
+  repo's <a href="https://github.com/zhenthebuilder/charter-gate">research companion</a>.</p>
+  <div class="grid">
+    <div class="card"><div class="num">164</div><p>public benchmark tasks per arm, paired design, exact McNemar test</p></div>
+    <div class="card"><div class="num">1 file</div><p>stdlib-only CLI; <code>uvx</code> stranger-install measured in seconds</p></div>
+    <div class="card"><div class="num">0</div><p>hidden-test leakage: the gate only checks model-authored smoke tests derived from the spec</p></div>
+  </div>
+  <p class="small">Numbers in the paper are generated from committed raw run logs by
+  <code>experiments/analyze.py</code> — nothing hand-typed.</p>
+</section>
+
+<section>
+  <h2>Install</h2>
+  <pre><span class="c"># one-shot run (recommended)</span>
+uvx --from git+https://github.com/zhenthebuilder/charter-gate charter --help
+
+<span class="c"># or install into your environment</span>
+pip install git+https://github.com/zhenthebuilder/charter-gate
+
+<span class="c"># or just take the single file</span>
+curl -fsSL https://raw.githubusercontent.com/zhenthebuilder/charter-gate/main/charter.py -o charter &amp;&amp; chmod +x charter</pre>
+</section>
+
+<footer>
+  charter · MIT license · <a href="https://github.com/zhenthebuilder/charter-gate">github.com/zhenthebuilder/charter-gate</a>
+</footer>
+
+</div>
+</body>
+</html>
